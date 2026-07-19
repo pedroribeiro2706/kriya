@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedro Ribeiro - Digital Portfolio</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- GSAP Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- ====== Hero Section ====== -->
+  <header id="hero" class="hero-section d-flex align-items-center justify-content-center text-center" style="min-height:100vh;">
+    <div class="container">
+      <!-- Título Principal -->
+      <h1 class="hero-title display-1 fw-bold">Pedro Ribeiro</h1>
+      <!-- Subtítulo mais amplo -->
+      <h2 class="hero-subtitle fs-1">Multidisciplinary Designer</h2>
+      <!-- Breve descrição -->
+      <p class="lead my-4">
+        I craft audio-visual content, motion graphics, websites, apps, and more.
+      </p>
+      <!-- Imagem Abstrata ou Criativa -->
+      <img 
+        src="assets/abstract-creative.jpg" 
+        alt="Creative Abstract" 
+        class="hero-image img-fluid mb-4" 
+        style="max-width:400px;"
+      >
+      <!-- Botão Circular com Seta -->
+      <div class="hero-button-wrapper mt-2">
+        <a href="#explore" class="btn btn-circle text-decoration-none">
+          <!-- Ícone de seta (Bootstrap Icons ou SVG) -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v10.793l3.146-3.147a.5.5 0 1 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 12.293V1.5A.5.5 0 0 1 8 1z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+  
+
+  <!-- ====== Explore Section ====== -->
+  <section id="explore" class="py-5">
+    <div class="container">
+      <h2 class="mb-4 text-center">Explore what I can do for you</h2>
+      <p class="text-center mb-5">As a digital designer, I am a visual storyteller, crafting experiences that connect deeply and spark creativity.</p>
+      <!-- Accordion para os tópicos -->
+      <div class="accordion" id="servicesAccordion">
+        <!-- Accordion Item 1: UI/UX Design -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+              1. UI/UX Design
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#servicesAccordion">
+            <div class="accordion-body">
+              <ul>
+                <li>Wireframing and prototyping</li>
+                <li>Usability testing and user feedback analysis</li>
+                <li>User Interface design for web and mobile apps</li>
+                <li>Interaction design and micro-animations</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Accordion Item 2: Graphic Design -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              2. Graphic Design
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#servicesAccordion">
+            <div class="accordion-body">
+              <ul>
+                <li>Logo and brand identity design</li>
+                <li>Social media graphics and ad creatives</li>
+                <li>Infographics and data visualization</li>
+                <li>Custom illustrations and icons</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Accordion Item 3: Web Design -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+              3. Web Design
+            </button>
+          </h2>
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#servicesAccordion">
+            <div class="accordion-body">
+              <ul>
+                <li>Responsive website design</li>
+                <li>Landing page design and optimization</li>
+                <li>Webflow development and customization</li>
+                <li>Website maintenance and updates</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- Accordion Item 4: Branding -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingFour">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+              4. Branding
+            </button>
+          </h2>
+          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#servicesAccordion">
+            <div class="accordion-body">
+              <ul>
+                <li>Brand strategy and identity development</li>
+                <li>Visual style guide creation</li>
+                <li>Typography and color scheme selection</li>
+                <li>Brand storytelling and messaging</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== Featured Projects Section (Horizontal Scroll Carousel) ====== -->
+  <section id="featured-projects" class="py-5">
+    <div class="container">
+      <h2 class="mb-4 text-center">Featured Projects</h2>
+      <!-- Container horizontal para o carrossel de projetos -->
+      <div class="carousel-wrapper" style="overflow-x:auto; white-space:nowrap; scroll-snap-type: x mandatory;">
+        <!-- Exemplo de card estático (será substituído ou complementado com conteúdo dinâmico via JS) -->
+        <div class="card d-inline-block me-3" style="width: 18rem; scroll-snap-align: start;">
+          <img src="assets/project1.jpg" class="card-img-top" alt="Project Image">
+          <div class="card-body">
+            <span class="badge bg-primary">UI/UX Design</span>
+            <h5 class="card-title mt-2">ShopEase Redesign Sprint</h5>
+            <p class="card-text"><small class="text-muted">September 22, 2024</small></p>
+            <p class="card-text">Redesigned the "ShopEase" e-commerce app to enhance user experience. Focused on simplifying navigation, optimizing the checkout process, and incorporating a sleek design.</p>
+            <a href="#" class="btn btn-outline-primary">View Project</a>
+          </div>
+        </div>
+        <!-- Outros cards serão gerados dinamicamente com base no arquivo projects.json -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== About Me Section ====== -->
+  <section id="about-me" class="py-5 bg-light">
+    <div class="container text-center">
+      <h2>About me</h2>
+      <h3 class="mt-3">HI, I'M Duncan Robert</h3>
+      <p class="mt-3">I am a digital designer and Webflow developer with a passion for creating meaningful and impactful digital experiences.</p>
+      <div class="contact-info my-4">
+        <p><strong>Call Today :</strong> +1 (555) 123-4567</p>
+        <p><strong>Email :</strong> designer@example.com</p>
+      </div>
+      <div class="stats d-flex justify-content-center gap-4">
+        <div>
+          <h3>12</h3>
+          <p>Years of Experience</p>
+        </div>
+        <div>
+          <h3>270</h3>
+          <p>Completed Projects</p>
+        </div>
+        <div>
+          <h3>50+</h3>
+          <p>Clients Worldwide</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== Let's Work Together Section ====== -->
+  <section id="contact" class="py-5">
+    <div class="container">
+      <h2 class="mb-4 text-center">Let's work together</h2>
+      <p class="text-center mb-5">Get in touch to discuss your next project or collaboration opportunity.</p>
+      <form id="contactForm" class="mx-auto" style="max-width: 600px;">
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" class="form-control" id="name" placeholder="Your Name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="Your Email" required>
+        </div>
+        <div class="mb-3">
+          <label for="message" class="form-label">Message</label>
+          <textarea class="form-control" id="message" rows="4" placeholder="Your Message" required></textarea>
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ====== Scripts ====== -->
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS (Vite gerencia os módulos) -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

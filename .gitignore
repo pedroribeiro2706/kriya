@@ -1,0 +1,19 @@
+# Dependências
+node_modules/
+
+# Assets pesados de design — ficam no OneDrive, não no git (limite de 100 MB do GitHub)
+Photoshop/
+Videos/
+
+# Pacote Club GSAP redundante (os .min.js usados pelo site estão em js/)
+js/gsap-premium/
+js/gsap-premium.zip
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+__MACOSX/
+
+# Build do Vite
+dist/

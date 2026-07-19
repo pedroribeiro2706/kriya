@@ -1,0 +1,325 @@
+/* Remove margens e centraliza tudo */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+  }
+  
+  /* ================= SEÇÃO 01 ================= */
+  /*#hero {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }*/
+
+  #hero {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+}
+
+  
+  /* Contêiner para o texto */
+  .coffee-text-wrapper {
+    position: absolute;
+    bottom: 5%; /* Distância do rodapé */
+    left: 5%; /* Distância da lateral esquerda */
+    font-family: "TT Commons", sans-serif;
+    font-size: 1.8rem;
+    color: white;
+    z-index: 4; /* Acima do vídeo */
+    overflow: hidden;
+    white-space: nowrap; /* Evita quebra de linha */
+  }
+  
+  /* Cursor piscando 
+  .coffee-text-wrapper::after {
+    content: "|";
+    display: inline-block;
+    margin-left: 5px;
+    animation: blink 0.8s infinite;
+  }*/
+  
+  .cursor {
+    display: inline-block;
+    font-weight: bold;
+    animation: blink 0.6s infinite alternate;
+  }
+  
+  @keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  /*@keyframes blink {
+    50% { opacity: 0; }
+  }*/
+  
+  /* Switch Button (mantém acima de tudo) */
+  #switch-btn {
+    position: absolute;
+    right: 10%;
+    top: 15%; /* 🔥 Agora o botão começa mais acima */
+    transform: translateY(-50%);
+    width: 150px;
+    cursor: pointer;
+    z-index: 4;
+  }
+  
+  
+  .st0 { fill: #fff; } /* Círculo */
+  .st1 { fill: #7ed957; } /* Fundo */
+  
+  /* Overlay preto cobrindo o vídeo (inicialmente 100% opaco) */
+  /* Overlay preto cobrindo o vídeo */
+  .black-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 1;
+    z-index: 3;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none; /* 🔥 Permite que o mouse interaja com o vídeo por trás */
+  }
+  
+  /* Efeito "raio-x" do mouse */
+  .cursor-mask {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    background: transparent;
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: difference; /* 🔥 Faz o buraco revelar o vídeo */
+    /*border: 2px solid rgba(255, 255, 255, 0.5);*/
+    z-index: 5;
+    transform: translate(-50%, -50%); /* Mantém alinhado ao cursor */
+  }
+  
+  /* Contêiner para "PEDRO RIBEIRO" */
+  .hero-designer-wrapper {
+    position: absolute;
+    top: 40%; /* Um pouco acima do centro */
+    left: 10.3%; /* Alinhado à esquerda */
+    overflow: hidden;
+    height: 45px;
+    z-index: 2;
+  }
+  
+  /* Texto "PEDRO RIBEIRO" */
+  .hero-designer {
+    font-family: "Saira Extra Condensed", sans-serif;
+    font-weight: 600;
+    font-size: 2.7rem; /* Tamanho base */
+    color: #cb6ce6; /* Cor ajustada */
+    transform: translateY(100%);
+  }
+  
+  /* Contêiner para "MULTI" */
+  .hero-title-01-wrapper {
+    position: absolute;
+    top: 47%; /* Centralizado verticalmente */
+    left: 10%; /* Mesmo alinhamento de "PEDRO RIBEIRO" */
+    overflow: hidden;
+    height: 124px; /* Ajustado para comportar o tamanho maior */
+    z-index: 2;
+  }
+  
+  /* Texto "MULTI" */
+  .hero-title-01 {
+    /*font-family: "Saira Extra Condensed", sans-serif;
+    font-weight: 800;*/
+    font-family: "league-gothic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: calc(3rem * 3.2); /* 3.2x maior que "PEDRO RIBEIRO" */
+    color: white;
+    transform: translateY(-100%);
+    line-height: 0.9; /* Ajuste para alinhar baseline */
+  }
+  
+  /* Contêiner para "DESIGNPLINARY" */
+  .hero-title-02-wrapper {
+    position: absolute;
+    top: 47%; /* Alinhado com "MULTI" */
+    left: 28%; /* Ajustado para começar a partir do "I" de "MULTI" */
+    width: 950px; /* Ajustado para a largura certa */
+    height: 215px; /* Aumentado para não cortar a palavra ao descer */
+    overflow: hidden; /* Cria a máscara */
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  /* Texto "DESIGNPLINARY" */
+  .hero-title-02 {
+    font-family: "league-gothic", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: calc(4rem * 1.2); /* Um pouco menor que "MULTI" */
+    color: white;
+    transform: translateX(-100%); /* Começa totalmente escondido */
+    white-space: nowrap; /* Evita quebra de linha */
+  }
+  
+  /* Contêiner para a descrição */
+  .hero-description-wrapper {
+    position: absolute;
+    top: 78%; /* 🔥 Ajustado para ficar logo abaixo de "DESIGNPLINARY" */
+    left: 66%; /* 🔥 Agora está alinhado corretamente com "DESIGNPLINARY" */
+    width: 390px; /* 🔥 Ajustado para melhor quebra de linha */
+    height: 60px; /* Mantido para comportar duas linhas */
+    overflow: hidden; /* Mantém o efeito de máscara */
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  /* Texto da descrição */
+  .hero-description {
+    font-family: "tt-commons-pro", sans-serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    color: white;
+    transform: translateY(-100%); /* 🔥 Agora começa acima e desce */
+    text-align: left; /* 🔥 Alinhado à esquerda */
+    line-height: 1.4; /* 🔥 Ajuste fino para espaçamento entre linhas */
+  }
+  
+  
+  /* Contêiner da seta */
+  .scroll-down-wrapper {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    opacity: 0; /* Começa invisível */
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+    z-index: 4;
+  }
+  
+  /* Texto "Scroll Down" */
+  .scroll-text {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 5px;
+    opacity: 0.7;
+  }
+  
+  /* Animação da seta */
+  .scroll-arrow {
+    width: 30px;
+    height: 30px;
+    stroke: white;
+    animation: bounce 1.5s infinite ease-in-out;
+  }
+  
+  /* Efeito de "pulsar" da seta */
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(5px);
+    }
+  }
+  
+  
+  /* Vídeo de fundo */
+  .hero-video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1; /* Atrás do overlay e do botão */
+  }
+  
+  
+  
+  /* ########################### SEÇÃO 02 ################################*/
+  
+  
+  /* Explore Section (inicialmente escondida) */
+  .explore-section {
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    top: 100vh; /* 🔥 Começa fora da tela */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Fundo escuro que some quando a luz acende */
+  .explore-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 3; /* Sobre tudo, some depois */
+  }
+  
+  /* Placeholder da luminária */
+  .lamp-placeholder {
+    position: absolute;
+    top: -10%;
+    right: 10%;
+    width: 150px;
+    height: 150px;
+    background: gray;
+    border-radius: 50%;
+    opacity: 1;
+    z-index: 4; /* Acima do overlay */
+  }
+  
+  /* Textos da seção */
+  .explore-content {
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    color: white;
+    text-align: left;
+    z-index: 2;
+    opacity: 1; /* Some no início */
+  }
+  
+  /* Máscara da luz */
+  .light-mask {
+    position: absolute;
+    top: 20%;
+    left: 30%;
+    width: 400px;
+    height: 400px;
+    background: white;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    z-index: 1;
+    opacity: 0; /* Surge quando a luz acende */
+  }
+  
+  
+  /* TESTES */
+  
+  .container {
+    width: 250px;
+    height: 250px;
+    background-color: #70e66c;
+    border-radius: 50px;
+  }
+  
+  .quadrado {
+    width: 150px;
+    height: 150px;
+    background-color: #cb6ce6;
+    border-radius: 50px;
+  }

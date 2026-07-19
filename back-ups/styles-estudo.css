@@ -1,0 +1,111 @@
+/* Reset básico para remover margens e paddings padrão */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Garantindo que o body ocupa toda a tela e usa um fundo neutro */
+body {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* 🔥 Estilização das seções */
+.section {
+    min-height: 100vh; /* Cada seção ocupa a tela toda */
+    display: flex;
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    text-align: center; /* Centraliza o texto */
+    padding: 50px;
+}
+
+/* 🔥 Cores diferentes para cada seção */
+#hero { background-color: #ff6b6b; }      /* Vermelho */
+#explorer { background-color: #1dd1a1; } /* Verde */
+#featured { background-color: #54a0ff; } /* Azul */
+#about { background-color: #feca57; }    /* Amarelo */
+#contact { background-color: #5f27cd; }  /* Roxo */
+
+/* 🔥 Conteúdo dentro das seções */
+.content {
+    max-width: 800px; /* Evita textos muito longos */
+}
+
+/* 🔥 Títulos */
+.title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+    opacity: 0; /* Mantém invisível até a animação */
+}
+
+/* 🔥 Descrição */
+.description {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 0; /* Mantém invisível até a animação */
+}
+
+/* 🔥 Seção 1: Hero - Começa totalmente à esquerda */
+.title-hero {
+    transform: translateX(0vw);
+    opacity: 0;
+}
+
+.description-hero {
+    transform: translateX(0vw);
+    opacity: 0;
+}
+
+/* 🔥 Seção 2: Explorer */
+.title-explorer {
+    transform: translateX(100vw);
+}
+
+.description-explorer {
+    transform: translateX(-100vw);
+}
+
+/* 🔥 Seção 3: Featured */
+.title-featured {
+    transform: translateY(-30vw);
+}
+
+.description-featured {
+    transform: translateY(30vw);
+}
+
+/* 🔥 Seção 4: About */
+.title-about {
+    transform: translateX(-100vw);
+}
+
+.description-about {
+    transform: translateX(100vw);
+}
+
+/* 🔥 Seção 5: Contact */
+.title-contact {
+    transform: scale(0.5);
+}
+
+.description-contact {
+    transform: scale(0.5);
+}
+
+
+
+/* 🔥 Responsividade */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
+
+    .description {
+        font-size: 1.2rem;
+    }
+}

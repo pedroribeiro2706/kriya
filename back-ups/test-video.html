@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Scroll + Vídeo</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: black;
+            color: white;
+        }
+
+        .spacer {
+            height: 100vh;
+            background: gray;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: black;
+        }
+
+        .hero-video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!--div class="spacer">⬇️ Role para testar ⬇️</div-->
+
+    <section id="hero">
+        <video class="hero-video" src="coffee.mp4" playsinline></video>
+    </section>
+
+    <div class="spacer">⬆️ O scroll foi liberado! ⬆️</div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const heroVideo = document.querySelector(".hero-video");
+        heroVideo.pause();
+        heroVideo.currentTime = 0;
+
+        ScrollTrigger.create({
+            trigger: "#hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 9,
+            pin: true, // 🔥 Mantém a seção fixa enquanto o vídeo é controlado pelo scroll
+            onUpdate: (self) => {
+                let progress = self.progress;
+                let newTime = heroVideo.duration * progress;
+                heroVideo.currentTime = newTime;
+                console.log("🎥 currentTime atualizado:", newTime.toFixed(2));
+
+                // 🔥 Quando o vídeo atingir 95% do progresso, libera a rolagem
+                if (progress >= 0.95) {
+                    console.log("✅ Scroll liberado!");
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
