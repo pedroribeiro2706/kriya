@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kriya — Estação de Testes de Versões</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #111; color: #eee; font-family: 'Inter', system-ui, sans-serif; padding: 48px 24px; }
+    .container { max-width: 880px; margin: 0 auto; }
+    h1 { font-family: 'Saira Extra Condensed', sans-serif; font-weight: 800; font-size: 56px; line-height: 1; color: #7ed957; text-transform: uppercase; }
+    .subtitle { color: #999; margin: 8px 0 40px; font-size: 14px; }
+    h2 { font-family: 'Saira Extra Condensed', sans-serif; font-weight: 600; font-size: 26px; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin: 36px 0 12px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+    .card { display: block; text-decoration: none; color: inherit; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; transition: border-color .15s, transform .15s; }
+    .card:hover { border-color: #7ed957; transform: translateX(4px); }
+    .card .name { font-weight: 600; font-size: 15px; color: #7ed957; }
+    .card .desc { font-size: 13px; color: #aaa; margin-top: 4px; line-height: 1.5; }
+    .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
+    .tag.principal { background: #7ed957; color: #111; }
+    .tag.luminaria { background: #f5c542; color: #111; }
+    .nota { background: #1a1a1a; border-left: 3px solid #f5c542; padding: 12px 16px; font-size: 13px; color: #bbb; border-radius: 0 8px 8px 0; margin-top: 24px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Estação de Testes</h1>
+    <p class="subtitle">Todas as versões do site em um só lugar — abra cada uma, compare, e identifique a mais próxima do que você quer. Página temporária de trabalho, fora do site final.</p>
+
+    <h2>Páginas principais</h2>
+    <a class="card" href="/portfolio.html" target="_blank">
+      <span class="name">portfolio.html</span><span class="tag principal">Principal</span>
+      <div class="desc">A versão mais completa: export do Webflow + GSAP. Hero com switch, scrub do vídeo do café, seções services, about, projects, contact e footer.</div>
+    </a>
+    <a class="card" href="/index.html" target="_blank">
+      <span class="name">index.html</span><span class="tag luminaria">Luminária</span>
+      <div class="desc">Protótipo do hero (2 seções). A seção "explore" tem o placeholder da luminária e a máscara de luz. Usa coffee-02.mp4 e js/main.js.</div>
+    </a>
+    <a class="card" href="/test-video-02.html" target="_blank">
+      <span class="name">test-video-02.html</span><span class="tag luminaria">Luminária</span>
+      <div class="desc">Laboratório do scrub de vídeo + seção da luminária. Usa js/test-video-02.js (10 KB). Obs.: test-video-02-bkp-02.html é uma cópia idêntica deste arquivo.</div>
+    </a>
+    <a class="card" href="/animation.html" target="_blank">
+      <span class="name">animation.html</span>
+      <div class="desc">Export do Webflow com a seção de footer fixo.</div>
+    </a>
+
+    <h2>Cópias de avaliação (v-*)</h2>
+    <a class="card" href="/v-test-video-02-js-bkp.html" target="_blank">
+      <span class="name">v-test-video-02-js-bkp.html</span><span class="tag luminaria">Luminária</span>
+      <div class="desc">Mesmo HTML do test-video-02, mas rodando o JS alternativo js/test-video-02-bkp-02.js (15,5 KB — maior e não usado por nenhuma página; possivelmente outra tentativa da luminária).</div>
+    </a>
+    <a class="card" href="/v-index-bkp-03.html" target="_blank">
+      <span class="name">v-index-bkp-03.html</span>
+      <div class="desc">Versão bkp-03 do hero (styles-bkp-03.css + main-bkp-03.js). Cópia com caminhos consertados — o original em back-ups/ não rodava.</div>
+    </a>
+    <a class="card" href="/v-index-estudo.html" target="_blank">
+      <span class="name">v-index-estudo.html</span>
+      <div class="desc">Versão "estudo". Atenção: referencia css/styles.css e js/main.js atuais — o par original talvez fosse styles-estudo.css/main-estudo.js (em back-ups/).</div>
+    </a>
+    <a class="card" href="/v-test-video-03.html" target="_blank">
+      <span class="name">v-test-video-03.html</span><span class="tag luminaria">Luminária</span>
+      <div class="desc">Tentativa 03 do laboratório de vídeo (test-video-03.css/js). Cópia com caminhos consertados.</div>
+    </a>
+
+    <h2>Direto de back-ups/</h2>
+    <a class="card" href="/back-ups/teste.html" target="_blank">
+      <span class="name">back-ups/teste.html</span>
+      <div class="desc">Experimento isolado com teste.css — já funciona direto da pasta.</div>
+    </a>
+    <a class="card" href="/back-ups/test-video.html" target="_blank">
+      <span class="name">back-ups/test-video.html</span>
+      <div class="desc">Primeiro teste de vídeo (coffee.mp4 local) — já funciona direto da pasta.</div>
+    </a>
+
+    <p class="nota"><strong>Como usar:</strong> rode <code>npm run dev</code> na pasta do projeto e abra http://localhost:5173/versoes.html. As páginas marcadas com <span class="tag luminaria" style="margin:0">Luminária</span> contêm tentativas da seção da luminária vetorizada. Quando você identificar a versão mais próxima do que quer, me diga qual é — ela vira o ponto de partida do desenvolvimento.</p>
+  </div>
+</body>
+</html>

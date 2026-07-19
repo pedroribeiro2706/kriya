@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Section - Pedro Ribeiro</title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/test-video-02.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@600;800&display=swap" rel="stylesheet">
+  
+    <!-- Adobe Fonts (TT Commons) -->
+    <link rel="stylesheet" href="https://use.typekit.net/rsd7nnz.css">
+
+</head>
+<body>
+
+    <!--div class="spacer">⬇️ Role para testar ⬇️</div-->
+
+    <section id="hero">
+
+        <!-- Texto "How about a coffee?" -->
+        <div class="coffee-text-wrapper">
+            <p id="coffee-text"></p>
+        </div>
+
+        <!-- Switch Button (SVG COMPLETO, SEM CORTES) -->
+        <svg id="switch-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 197.1 99.4">
+            <defs>
+                <style>
+                    .st0 { fill: #fff; }  /* Círculo interno (mantém branco) */
+                    .st1 { fill: none; stroke: #fff; stroke-width: 3px; }  /* Fundo começa transparente com borda branca */
+                </style>
+            </defs>
+            
+            <!-- Fundo do botão -->
+            <path id="elipse" class="st1" d="M50.5,2h96.5c1.6,0,3.1,0,4.7.2,1.6.2,3.1.4,4.7.7s3.1.7,4.6,1.1c1.5.5,3,1,4.4,1.6,1.5.6,2.9,1.3,4.3,2,1.4.7,2.7,1.6,4,2.4,1.3.9,2.6,1.8,3.8,2.8,1.2,1,2.4,2.1,3.5,3.2,1.1,1.1,2.2,2.3,3.2,3.5,1,1.2,1.9,2.5,2.8,3.8.9,1.3,1.7,2.7,2.4,4,.7,1.4,1.4,2.8,2,4.3.6,1.5,1.1,2.9,1.6,4.4.5,1.5.8,3,1.1,4.6s.5,3.1.7,4.7c.2,1.6.2,3.1.2,4.7s0,3.1-.2,4.7c-.2,1.6-.4,3.1-.7,4.7s-.7,3.1-1.1,4.6c-.5,1.5-1,3-1.6,4.4-.6,1.5-1.3,2.9-2,4.3-.7,1.4-1.6,2.7-2.4,4-.9,1.3-1.8,2.6-2.8,3.8-1,1.2-2.1,2.4-3.2,3.5s-2.3,2.2-3.5,3.2c-1.2,1-2.5,1.9-3.8,2.8s-2.7,1.7-4,2.4c-1.4.7-2.8,1.4-4.3,2-1.5.6-2.9,1.1-4.4,1.6-1.5.5-3,.8-4.6,1.1s-3.1.5-4.7.7-3.1.2-4.7.2H50.5c-1.6,0-3.1,0-4.7-.2-1.6-.2-3.1-.4-4.7-.7-1.5-.3-3.1-.7-4.6-1.1-1.5-.5-3-1-4.4-1.6-1.5-.6-2.9-1.3-4.3-2-1.4-.7-2.7-1.5-4-2.4-1.3-.9-2.6-1.8-3.8-2.8-1.2-1-2.4-2.1-3.5-3.2s-2.2-2.3-3.2-3.5c-1-1.2-1.9-2.5-2.8-3.8-.9-1.3-1.7-2.7-2.4-4s-1.4-2.8-2-4.3c-.6-1.5-1.1-2.9-1.6-4.4-.5-1.5-.8-3-1.1-4.6-.3-1.5-.5-3.1-.7-4.7-.2-1.6-.2-3.1-.2-4.7s0-3.1.2-4.7c.2-1.6.4-3.1.7-4.7.3-1.5.7-3.1,1.1-4.6.5-1.5,1-3,1.6-4.4.6-1.5,1.3-2.9,2-4.3s1.6-2.7,2.4-4c.9-1.3,1.8-2.6,2.8-3.8,1-1.2,2.1-2.4,3.2-3.5,1.1-1.1,2.3-2.2,3.5-3.2,1.2-1,2.5-1.9,3.8-2.8,1.3-.9,2.7-1.7,4-2.4,1.4-.7,2.8-1.4,4.3-2,1.5-.6,2.9-1.1,4.4-1.6,1.5-.5,3-.8,4.6-1.1,1.5-.3,3.1-.5,4.7-.7,1.6-.2,3.1-.2,4.7-.2Z"/>
+
+            <!-- Círculo interno -->
+            <path id="ciculo" class="st0" d="M51.1,92.7c23.6,0,42.7-19.1,42.7-42.7S74.7,7.4,51.1,7.4,8.5,26.5,8.5,50s19.1,42.7,42.7,42.7Z"/>
+        </svg>
+        
+        <!-- Máscara do cursor para revelar conteúdo abixo do overlay -->
+        <div class="cursor-mask"></div>        
+
+        <!-- Overlay preto cobrindo o vídeo -->
+        <div class="black-overlay"></div>
+
+                <!-- Texto "PEDRO RIBEIRO" -->
+                <div class="hero-designer-wrapper">
+                    <h1 class="hero-designer">PEDRO RIBEIRO</h1>
+                </div>
+            
+                <!-- Texto "MULTI" -->
+                <div class="hero-title-01-wrapper">
+                    <h2 class="hero-title-01">MULTI</h2>
+                </div>
+            
+                <!-- Texto "DESIGNPLINARY" -->
+                <div class="hero-title-02-wrapper">
+                    <h2 class="hero-title-02">DESIGNPLINARY</h2>
+                </div>
+        
+                <!-- Texto "I craft audio-visual content..." -->
+                <div class="hero-description-wrapper">
+                    <p class="hero-description">
+                        I craft audio-visual content, motion graphics, websites, apps, and more.
+                    </p>
+                </div>
+        
+                <!-- Seta de Scroll -->
+                <div class="scroll-down-wrapper">
+                    <p class="scroll-text">Scroll down (Don't click)</p>
+                    <svg class="scroll-arrow" width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="10,30 50,70 90,30" stroke="green" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+        <video class="hero-video" src="assets/coffee-03.mp4" playsinline></video>
+        <!--video id="theVideo" tabindex="0" autobuffer preload>
+            <source src="assets/teste.mp4" type="video/mp4">
+        </video-->
+
+    </section>
+
+    <section id="explore" class="explore-section">
+    
+        <!-- Luminária -->
+        <img class="lamp-image" src="assets/luminaria.png" alt="Luminária">
+    
+        <!-- Máscara da luz -->
+        <div class="light-mask">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1366" viewBox="0 0 1024.5 576" height="768" preserveAspectRatio="xMidYMid meet" version="1.0">
+                <g>
+                    <path fill="#ffffff" d="M -117.328125 406.964844 L 764.148438 64.613281 C 793.296875 53.25 823.722656 77.6875 818.910156 108.601562 L 674.511719 1043.316406 C 669.699219 1074.230469 633.394531 1088.273438 609.054688 1068.71875 L -128.152344 476.523438 C -152.359375 456.808594 -146.476562 418.328125 -117.328125 406.964844 Z"/>
+                </g>
+            </svg>
+        </div>
+    
+        <!-- Título -->
+        <div class="explore-title-wrapper">
+            <h1 class="explore-title">WHAT CAN I <span>DO FOR YOU</span> TODAY?</h1>
+        </div>
+    
+        <!-- Descrição -->
+        <div class="explore-description-wrapper">
+            <p class="explore-description">
+                As a multi-disciplinary designer, I am a visual storyteller, crafting experiences that engage and connect deeply.
+            </p>
+        </div>
+    
+        <!-- Container geral -->
+        <div class="explore-container">
+            
+            <!-- MENU DE CATEGORIAS -->
+            <div class="explore-menu-wrap">
+                <div role="list" class="explore-menu">
+                    <div role="listitem" class="explore-menu-item">BRANDING</div>
+                    <div role="listitem" class="explore-menu-item">WEB DESIGN</div>
+                    <div role="listitem" class="explore-menu-item">ANIMATION</div>
+                    <div role="listitem" class="explore-menu-item">VISUAL IDENTITY</div>
+                </div>
+            </div>
+
+            <!-- ÁREA DE TEXTO DINÂMICO -->
+            <div class="explore-text-wrap">
+                <div role="list" class="explore-content">
+                    <div role="listitem" class="explore-text">
+                        <p>Texto do Branding</p>
+                    </div>
+                    <div role="listitem" class="explore-text">
+                        <p>Texto do Web Design</p>
+                    </div>
+                    <div role="listitem" class="explore-text">
+                        <p>Texto de Animation</p>
+                    </div>
+                    <div role="listitem" class="explore-text">
+                        <p>Texto de Visual Identity</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    
+        <!-- Botão de Navegação -->
+        <div class="explore-button">
+            <span class="arrow">→</span>
+        </div>
+    
+    </section>
+    
+
+    <!-- GSAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+    <!-- The following plugins are only available for Club GSAP members.--> 
+    <script src="js/ScrollSmoother.min.js"></script>
+    <script src="/js/SplitText.min.js"></script>
+
+    <!-- Custom JS -->
+    <script type="module" src="js/test-video-02-bkp-02.js"></script>
+
+</body>
+</html>
