@@ -2,6 +2,22 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
+## Atualização 20/07/2026 (segunda parte) — UAT confirmou 2 fixes, achou 1 bug novo, sessão reiniciando
+
+**UAT do Pedro confirmou os dois fixes do commit `262287f`:** o switch aparece e funciona, a animação da hero roda normal, o scroll é liberado depois, e a entrada/flicker/scroll da luminária (títulos + textos ao lado) funcionam como esperado.
+
+**Bug novo encontrado no screenshot (`references/secao-luminaria-pos-fix-01.png`):** o título da seção (`.lum-heading`, "O que podemos fazer por você, hoje?") não aparece — fica atrás/embaixo do menu fixo do site. Causa provável: `.lum-heading-wrap` tem `top: 8vh` em `css/luminaria.css`, posição alta demais dado que o menu fixo cobre ~150px do topo da viewport. O subtítulo (`.lum-heading-sub`, que vem depois no HTML e por isso fica mais abaixo) aparece normalmente — só o H2 fica coberto. **NÃO CORRIGIDO AINDA.** Calibrar `top` (ou adicionar padding-top considerando a altura do menu) é o próximo passo, agora com verificação visual real disponível.
+
+**Duas causas-raiz do bug do switch (resolvido) valem registrar para não repetir o erro:**
+1. O review final da branch (sem acesso a navegador) leu `<!--section class="avator-outterwrap"><section class="avator-sticky">...</section-->` como se fosse uma seção viva de 100vh entre a Hero e a luminária — mas é markup morto, comentado, lixo do export Webflow. O fix aplicado em cima dessa leitura errada (reancorar o trigger `hero-exit` em `.avator-sticky`) quebrou a timeline que esconde `#switch-btn`. Revertido para `.lum-section` (o elemento real).
+2. O link "O que fazemos" do menu apontava para `#service` (acordeon), que fica `display:none` no desktop — âncora para elemento sem caixa de layout não funciona. Adicionada `<div id="services-anchor">` sempre visível antes das duas versões da seção; menu atualizado para apontar para ela.
+
+**Lição para a próxima sessão:** fixes de CSS/animação/scroll baseados só em leitura de código, sem verificação visual ao vivo, têm risco real de introduzir regressões (foi exatamente o que aconteceu no ponto 1 acima). A extensão do Chrome está confirmada conectada e funcional agora (20/07, à tarde) — usar `mcp__claude-in-chrome__*` para verificar visualmente ANTES de declarar qualquer fix de UI como resolvido, não só depois.
+
+**Por que a sessão está sendo reiniciada:** a sessão anterior bateu o limite de uso do Fable 5 e o Claude Code trocou automaticamente para Sonnet 5. O painel de billing da conta confirma que o Fable 5 continua incluído no plano Max, e que ver uma mensagem de "configurar créditos de uso" significa que é preciso **reiniciar o Claude Code** (não basta `/model` dentro do processo já rodando) para a verificação de plano ser atualizada.
+
+**Commits desta sessão (20/07):** `ea7bc3d`..`262287f`, todos em `origin main`.
+
 ## Estado no fim da sessão de 20/07/2026 — seção da luminária implementada, aguardando UAT visual
 
 A seção da luminária (ver "A feature em desenvolvimento" abaixo) foi projetada (brainstorming → spec aprovada → plano) e **implementada inteira** em `index.html` + `css/luminaria.css`, via subagent-driven-development (7 tasks + 1 commit de correção do review final). Documentos:
