@@ -1725,6 +1725,24 @@
                     // Fase 1 (0–15): luminária entra da direita, apagada
                     lumMaster.to(".lum-rig", { x: 0, duration: 15 }, 0);
 
+                    // Fase 2 (20–75): títulos rolam continuamente; 75–85: leitura do 4º título
+                    const lumTitles = gsap.utils.toArray(".lum-title");
+                    const lumTexts = gsap.utils.toArray(".lum-text");
+                    // Distância entre títulos consecutivos, medida no layout real (função = recalcula no refresh)
+                    const stepY = () => lumTitles[1].offsetTop - lumTitles[0].offsetTop;
+
+                    lumMaster.to(".lum-titles", { y: () => -3 * stepY(), duration: 55 }, 20);
+
+                    // Trocas de título ativo nos pontos em que cada título cruza a zona ativa
+                    const switchPoints = [38, 57, 75]; // título 2, 3 e 4
+                    switchPoints.forEach((t, i) => {
+                        lumMaster
+                            .to(lumTitles[i],     { color: "#c9c9c9", duration: 2 }, t)
+                            .to(lumTitles[i + 1], { color: "#7ed957", duration: 2 }, t)
+                            .to(lumTexts[i],      { autoAlpha: 0, duration: 3 }, t)
+                            .to(lumTexts[i + 1],  { autoAlpha: 1, duration: 3 }, t + 1);
+                    });
+
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
                     lumMaster.set({}, {}, 100);
 
