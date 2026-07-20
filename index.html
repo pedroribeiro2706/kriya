@@ -1743,6 +1743,16 @@
                             .to(lumTexts[i + 1],  { autoAlpha: 1, duration: 3 }, t + 1);
                     });
 
+                    // Fase 3 (85–100): conteúdo sai, facho abre até a tela branca, luminária sai
+                    const LUM_CLIP_FULL = "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%)";
+
+                    lumMaster
+                        .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
+                        .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
+                        .to(".lum-heading-wrap", { autoAlpha: 0, y: -30, duration: 8 }, 85)
+                        .to(".lum-beam",         { clipPath: LUM_CLIP_FULL, duration: 15 }, 85)
+                        .to(".lum-rig",          { x: "110%", duration: 12 }, 87);
+
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
                     lumMaster.set({}, {}, 100);
 
