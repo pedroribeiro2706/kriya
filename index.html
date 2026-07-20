@@ -1637,8 +1637,12 @@
                     onUpdate: (self) => {
                         let progress = self.progress; // varia de 0 a 1
                         // Atualiza o currentTime do vídeo conforme o progresso
-                        let newTime = heroVideo.duration * progress;
-                        heroVideo.currentTime = newTime;
+                        // Guard: o evento 'load' da window não espera o <video> carregar
+                        // metadata, então duration pode chegar NaN na primeira atualização.
+                        if (isFinite(heroVideo.duration)) {
+                            let newTime = heroVideo.duration * progress;
+                            heroVideo.currentTime = newTime;
+                        }
                         // console.log("🎥 currentTime atualizado:", newTime.toFixed(2));
 
                         // 🔥 Quando o vídeo atingir 95% do progresso, libera a rolagem
