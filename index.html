@@ -1686,6 +1686,18 @@
                         .to(".scroll-down-wrapper", { autoAlpha: 0 }, 0);
 
                     // --- Master timeline da seção (duração virtual 100; fases da spec) ---
+                    // --- Luz liga: flicker de lâmpada + revelação (disparada, não scrubbed) ---
+                    const lightOn = gsap.timeline({ paused: true });
+                    lightOn
+                        .fromTo(".lum-beam", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" })
+                        .to(".lum-beam", { opacity: 0.15, duration: 0.06, ease: "none" })
+                        .to(".lum-beam", { opacity: 1, duration: 0.05, ease: "none" })
+                        .to(".lum-beam", { opacity: 0.4, duration: 0.07, ease: "none" })
+                        .to(".lum-beam", { opacity: 1, duration: 0.12, ease: "none" })
+                        .fromTo(".lum-heading-wrap",
+                            { autoAlpha: 0, y: 24 },
+                            { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.05");
+
                     let isLit = false; // Task 4 usa
 
                     const lumMaster = gsap.timeline({
@@ -1699,7 +1711,13 @@
                             id: "lum",
                             markers: true, // DEV — remover na Task 7
                             onUpdate: (self) => {
-                                // Task 4 preenche: disparo/reversão da lightOn em progress 0.15
+                                if (self.progress >= 0.15 && !isLit) {
+                                    isLit = true;
+                                    lightOn.timeScale(1).play();
+                                } else if (self.progress < 0.15 && isLit) {
+                                    isLit = false;
+                                    lightOn.timeScale(3).reverse(); // apaga rápido, sem drama de flicker
+                                }
                             }
                         }
                     });
