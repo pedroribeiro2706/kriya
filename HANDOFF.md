@@ -1,6 +1,24 @@
-# HANDOFF — Retomada do projeto (2026-07-19)
+# HANDOFF — Retomada do projeto (2026-07-19, atualizado 2026-07-20)
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
+
+## Estado no fim da sessão de 20/07/2026 — seção da luminária implementada, aguardando UAT visual
+
+A seção da luminária (ver "A feature em desenvolvimento" abaixo) foi projetada (brainstorming → spec aprovada → plano) e **implementada inteira** em `index.html` + `css/luminaria.css`, via subagent-driven-development (7 tasks + 1 commit de correção do review final). Documentos:
+- Spec: `docs/superpowers/specs/2026-07-19-secao-luminaria-design.md`
+- Plano: `docs/superpowers/plans/2026-07-19-secao-luminaria.md`
+- Commits: `ea7bc3d`..`3c7a913` (todos em `origin main`)
+
+**O que falta, em ordem:**
+1. **UAT visual com o Pedro.** Nenhuma verificação no navegador aconteceu nesta sessão — a extensão claude-in-chrome ficou desconectada o tempo todo. Toda verificação foi estática (sintaxe JS, greps de posicionamento, HTTP 200) + review de spec por task + um review final de arquitetura que pegou 1 Critical + 3 Important (todos corrigidos no commit `3c7a913`) + minors. **Abrir http://localhost:5173/index.html e testar ao vivo é o próximo passo obrigatório antes de qualquer coisa.**
+2. A reconfirmação automática dos fixes do review final falhou por limite de uso de sessão do subagente (resolvido: eu mesmo verifiquei o diff `ba75012..3c7a913` linha a linha contra o que o review pedia — os 6 fixes batem, nenhum problema novo visível). Ainda assim, é uma segunda opinião que só a UAT visual substitui de verdade.
+3. Pontos específicos para olhar na UAT (o review final já anotou como prováveis pontas soltas):
+   - O recorte diagonal do facho (`--lum-clip-on` em `css/luminaria.css`) pode cortar as listas de texto mais longas (item 1 tem 8 linhas) — calibrar o polígono.
+   - A transição hero → seção preta (o "vão" da seção `.avator-sticky`, 100vh) — o `hero-exit` foi reancorado nela no fix, mas nunca foi visto rodando.
+   - Scroll-slam (ida/volta muito rápida) no trecho 15%↔85% — testar que nada fica preso.
+   - Resize no meio do pin.
+4. Minors deixados de propósito para a calibração (não corrigir sem o Pedro decidir): classe `is-active` sem prefixo `lum-`; `font-family` "Coolvetica Compressed Hv" duplicada em 2 pontos do `luminaria.css` em vez de var.
+5. No mobile (≤991px) a seção antiga do acordeon (`#service`) continua sendo exibida — isso é intencional (decisão da spec), não um bug.
 
 ## O que é este projeto
 

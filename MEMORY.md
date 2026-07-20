@@ -15,3 +15,4 @@ Fatos-chave do projeto (detalhes e narrativa completa em `HANDOFF.md`):
 ## Log de sessões
 
 - **2026-07-19** — Retomada: diagnóstico do projeto, git init + push inicial (`c2bd7d6`), clone para fora do OneDrive, estação de testes de versões (`c4def0a`), handoff criado. Pedro testou todas as versões na estação — conclusões ainda não comunicadas; pedir na próxima sessão.
+- **2026-07-20** — Pedro comunicou as conclusões (`revisao.md`); setup do `index.html` como cópia de trabalho do `portfolio.html` (`index.html` antigo virou `index-old-02.html`). Brainstorming da seção da luminária → spec aprovada → plano de 7 tasks → implementação via subagentes (commits `ea7bc3d`..`3c7a913`, todos em `origin main`). **Pendente: UAT visual** (nenhuma verificação em navegador rodou nesta sessão — extensão desconectada). Detalhes e pontas soltas no `HANDOFF.md`.
