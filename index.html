@@ -1658,6 +1658,61 @@
                     document.body.style.overflow = ''; // or 'auto'
                 });
 
+                // ################################## SEÇÃO DA LUMINÁRIA ######################################
+
+                const mm = gsap.matchMedia();
+
+                mm.add("(min-width: 992px)", () => {
+
+                    // --- Saída animada dos títulos da hero (enquanto a seção da luminária sobe) ---
+                    // Direções conforme main-bkp-03.js: "PEDRO RIBEIRO" desce, "MULTI" sobe,
+                    // "DESIGNPLINARY" desce, descrição sobe, switch e seta somem em fade.
+                    gsap.timeline({
+                        scrollTrigger: {
+                            trigger: ".lum-section",
+                            start: "top bottom",
+                            end: "top top",
+                            scrub: 1,
+                            id: "hero-exit",
+                            markers: true // DEV — remover na Task 7
+                        },
+                        defaults: { ease: "none" }
+                    })
+                        .to(".hero-designer", { y: 220, autoAlpha: 0 }, 0)
+                        .to(".hero-title-01", { y: -220, autoAlpha: 0 }, 0)
+                        .to(".hero-title-02", { y: "+=220", autoAlpha: 0 }, 0)
+                        .to(".hero-description", { y: -180, autoAlpha: 0 }, 0)
+                        .to("#switch-btn", { autoAlpha: 0 }, 0)
+                        .to(".scroll-down-wrapper", { autoAlpha: 0 }, 0);
+
+                    // --- Master timeline da seção (duração virtual 100; fases da spec) ---
+                    let isLit = false; // Task 4 usa
+
+                    const lumMaster = gsap.timeline({
+                        defaults: { ease: "none" },
+                        scrollTrigger: {
+                            trigger: ".lum-section",
+                            start: "top top",
+                            end: "+=4000",
+                            pin: true,
+                            scrub: 1,
+                            id: "lum",
+                            markers: true, // DEV — remover na Task 7
+                            onUpdate: (self) => {
+                                // Task 4 preenche: disparo/reversão da lightOn em progress 0.15
+                            }
+                        }
+                    });
+
+                    // Fase 1 (0–15): luminária entra da direita, apagada
+                    lumMaster.to(".lum-rig", { x: 0, duration: 15 }, 0);
+
+                    // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
+                    lumMaster.set({}, {}, 100);
+
+                    return () => { /* cleanup automático do matchMedia (kill dos triggers do contexto) */ };
+                });
+
             });
         </script>
 
