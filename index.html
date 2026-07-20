@@ -1673,8 +1673,7 @@
                             start: "top bottom",
                             end: "top top",
                             scrub: 1,
-                            id: "hero-exit",
-                            markers: true // DEV — remover na Task 7
+                            id: "hero-exit"
                         },
                         defaults: { ease: "none" }
                     })
@@ -1709,7 +1708,6 @@
                             pin: true,
                             scrub: 1,
                             id: "lum",
-                            markers: true, // DEV — remover na Task 7
                             onUpdate: (self) => {
                                 if (self.progress >= 0.15 && !isLit) {
                                     isLit = true;
