@@ -16,7 +16,9 @@
 /* Título da seção — fora do facho, branco sobre preto (mockup) */
 .lum-heading-wrap {
     position: absolute;
-    top: 8vh;
+    /* Fixo em px, não vh: o menu (nav.w-nav) tem altura fixa (~128px) que não
+       escala com a viewport, então um valor proporcional descola em telas baixas. */
+    top: 160px;
     left: 6vw;
     max-width: 34rem;
     z-index: 2;
