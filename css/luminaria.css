@@ -1,0 +1,118 @@
+/* ============ SEÇÃO DA LUMINÁRIA ============ */
+.lum-section {
+    --lum-bg: #000;
+    --lum-green: #7ed957;
+    --lum-title-idle: #c9c9c9;
+    --lum-text-ink: #303030;
+    /* Os dois polígonos têm 5 vértices — obrigatório para o GSAP interpolar */
+    --lum-clip-on: polygon(62% 10%, 78% 24%, 42% 100%, 0% 100%, 0% 58%);
+    --lum-clip-full: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%);
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--lum-bg);
+}
+
+/* Título da seção — fora do facho, branco sobre preto (mockup) */
+.lum-heading-wrap {
+    position: absolute;
+    top: 8vh;
+    left: 6vw;
+    max-width: 34rem;
+    z-index: 2;
+    opacity: 0; /* revelado pela timeline lightOn */
+}
+.lum-heading {
+    margin: 0;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 3.4rem;
+    line-height: 1.05;
+    font-family: "Coolvetica Compressed Hv", sans-serif;
+}
+.lum-heading-accent { color: var(--lum-green); }
+.lum-heading-sub {
+    margin-top: 1.2rem;
+    color: #fff;
+    font-size: 1.05rem;
+    line-height: 1.5;
+}
+
+/* Facho de luz — máscara de visibilidade do conteúdo */
+.lum-beam {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: #fff;
+    clip-path: var(--lum-clip-on);
+    opacity: 0; /* apagado até a lightOn tocar */
+}
+.lum-beam-inner {
+    position: absolute;
+    inset: 0;
+}
+
+/* Coluna de títulos — desliza verticalmente (JS anima o container) */
+.lum-titles {
+    position: absolute;
+    left: 6vw;
+    top: 55vh; /* 1º título alinhado à zona ativa (centro do facho) */
+    z-index: 1;
+}
+.lum-title {
+    margin: 0 0 2.6rem;
+    color: var(--lum-title-idle);
+    text-transform: uppercase;
+    font-size: 2.6rem;
+    line-height: 1;
+    white-space: nowrap;
+    font-family: "Coolvetica Compressed Hv", sans-serif;
+}
+.lum-title.is-active { color: var(--lum-green); }
+
+/* Coluna de textos — blocos empilhados na mesma posição, crossfade */
+.lum-texts {
+    position: absolute;
+    left: 34vw;
+    top: 48vh;
+    width: 30vw;
+}
+.lum-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--lum-text-ink);
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0;
+    visibility: hidden;
+}
+.lum-text.is-active { opacity: 1; visibility: visible; }
+.lum-text li { margin-bottom: 0.35rem; }
+
+/* Luminária — slot substituível (futuro: SVG articulado no lugar do PNG) */
+.lum-rig {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    z-index: 3;
+    transform: translateX(110%); /* estado inicial: fora da tela */
+    pointer-events: none;
+}
+.lum-rig img {
+    height: 100%;
+    width: auto;
+    display: block;
+}
+
+/* Alternância desktop/mobile: luminária é experiência desktop */
+@media screen and (max-width: 991px) {
+    .lum-section { display: none; }
+}
+@media screen and (min-width: 992px) {
+    #service { display: none; }
+}
