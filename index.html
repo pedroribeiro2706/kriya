@@ -1656,6 +1656,7 @@
                 heroTimeline.eventCallback("onComplete", () => {
                     heroScrollTrigger.enable();
                     document.body.style.overflow = ''; // or 'auto'
+                    ScrollTrigger.refresh();
                 });
 
                 // ################################## SEÇÃO DA LUMINÁRIA ######################################
@@ -1669,7 +1670,7 @@
                     // "DESIGNPLINARY" desce, descrição sobe, switch e seta somem em fade.
                     gsap.timeline({
                         scrollTrigger: {
-                            trigger: ".lum-section",
+                            trigger: ".avator-sticky",
                             start: "top bottom",
                             end: "top top",
                             scrub: 1,
@@ -1684,7 +1685,6 @@
                         .to("#switch-btn", { autoAlpha: 0 }, 0)
                         .to(".scroll-down-wrapper", { autoAlpha: 0 }, 0);
 
-                    // --- Master timeline da seção (duração virtual 100; fases da spec) ---
                     // --- Luz liga: flicker de lâmpada + revelação (disparada, não scrubbed) ---
                     const lightOn = gsap.timeline({ paused: true });
                     lightOn
@@ -1697,6 +1697,7 @@
                             { autoAlpha: 0, y: 24 },
                             { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.05");
 
+                    // --- Master timeline da seção (duração virtual 100; fases da spec) ---
                     let isLit = false; // Task 4 usa
 
                     const lumMaster = gsap.timeline({
@@ -1707,6 +1708,7 @@
                             end: "+=4000",
                             pin: true,
                             scrub: 1,
+                            invalidateOnRefresh: true,
                             id: "lum",
                             onUpdate: (self) => {
                                 if (self.progress >= 0.15 && !isLit) {
@@ -1742,12 +1744,12 @@
                     });
 
                     // Fase 3 (85–100): conteúdo sai, facho abre até a tela branca, luminária sai
-                    const LUM_CLIP_FULL = "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%)";
+                    const LUM_CLIP_FULL = getComputedStyle(document.querySelector(".lum-section")).getPropertyValue("--lum-clip-full").trim();
 
                     lumMaster
                         .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
                         .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
-                        .to(".lum-heading-wrap", { autoAlpha: 0, y: -30, duration: 8 }, 85)
+                        .fromTo(".lum-heading-wrap", { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -30, duration: 8, immediateRender: false }, 85)
                         .to(".lum-beam",         { clipPath: LUM_CLIP_FULL, duration: 15 }, 85)
                         .to(".lum-rig",          { x: "110%", duration: 12 }, 87);
 
