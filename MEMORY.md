@@ -14,4 +14,4 @@ Fatos-chave do projeto (detalhes e narrativa completa em `HANDOFF.md`):
 
 ## Log de sessões
 
-- **2026-07-19** — Retomada: diagnóstico do projeto, git init + push inicial (`c2bd7d6`), clone para fora do OneDrive, estação de testes de versões (`c4def0a`), handoff criado.
+- **2026-07-19** — Retomada: diagnóstico do projeto, git init + push inicial (`c2bd7d6`), clone para fora do OneDrive, estação de testes de versões (`c4def0a`), handoff criado. Pedro testou todas as versões na estação — conclusões ainda não comunicadas; pedir na próxima sessão.

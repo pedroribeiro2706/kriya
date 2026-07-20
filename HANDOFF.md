@@ -31,7 +31,7 @@ O Pedro ainda vai explicar **como a seção deve funcionar** (o que a luz revela
 
 ## Próximos passos combinados
 
-1. **[Pedro]** Testar todas as versões em http://localhost:5173/versoes.html e identificar a mais próxima do que quer para a seção da luminária.
+1. ~~**[Pedro]** Testar todas as versões~~ ✅ **FEITO em 19/07/2026** — Pedro analisou todos os arquivos na estação de testes, mas **ainda não comunicou as conclusões**. Primeira coisa a fazer na sessão: perguntar qual versão é o melhor ponto de partida e o que ele observou em cada uma.
 2. **[Pedro]** Explicar o comportamento desejado da luminária.
 3. **[Agente]** Desenvolver a seção da luminária a partir da versão escolhida, integrando ao `portfolio.html`.
 4. **[Depois]** Limpeza adiada: remover protótipos obsoletos (só após a luminária pronta), consolidar as ~7 variações de logo em `assets/`, remover `assets/predibase_c1_01_master.mp4` (160 bytes, corrompido), decidir promoção de `portfolio.html` a `index.html`, remover as `<div class="glasp-extension">` (lixo de extensão de navegador) do fim do portfolio.html, e avaliar migrar GSAP para npm.
