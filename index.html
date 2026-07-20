@@ -361,7 +361,7 @@
                     <div class="nav-menu-grid">
                         <div id="w-node-_04648367-3bf2-7057-8c8b-54f3852c6393-852c638c" class="nav-menu-list"><a
                                 href="#hero" class="nav-link w-nav-link">Início</a><a
-                                href="#service" class="nav-link w-nav-link">O que fazemos</a><a
+                                href="#services-anchor" class="nav-link w-nav-link">O que fazemos</a><a
                                 href="#about" class="nav-link w-nav-link">A gente</a><a
                                 href="#project" class="nav-link w-nav-link">Projetos</a>
                         </div>
@@ -508,6 +508,7 @@
                 </div>
             </div>
         </section-->
+        <div id="services-anchor" aria-hidden="true"></div>
         <!-- ============ SEÇÃO DA LUMINÁRIA (versão desktop da seção services) ============ -->
         <section id="luminaria" class="lum-section" aria-label="O que podemos fazer por você, hoje?">
             <div class="lum-heading-wrap">
@@ -1670,7 +1671,7 @@
                     // "DESIGNPLINARY" desce, descrição sobe, switch e seta somem em fade.
                     gsap.timeline({
                         scrollTrigger: {
-                            trigger: ".avator-sticky",
+                            trigger: ".lum-section",
                             start: "top bottom",
                             end: "top top",
                             scrub: 1,
