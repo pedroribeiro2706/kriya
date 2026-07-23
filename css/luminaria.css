@@ -5,7 +5,7 @@
     --lum-title-idle: #c9c9c9;
     --lum-text-ink: #303030;
     /* Os dois polígonos têm 5 vértices — obrigatório para o GSAP interpolar */
-    --lum-clip-on: polygon(62% 10%, 78% 24%, 42% 100%, 0% 100%, 0% 58%);
+    --lum-clip-on: polygon(75.0% 31.2%, 74.9% 60%, 74.9% 100%, -2.1% 100%, -2.1% 56%);
     --lum-clip-full: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%);
     position: relative;
     height: 100vh;
@@ -98,9 +98,9 @@
 /* Luminária — slot substituível (futuro: SVG articulado no lugar do PNG) */
 .lum-rig {
     position: absolute;
-    top: 0;
+    bottom: 0;
     right: 0;
-    height: 100vh;
+    height: 82.2vh; /* topo ~10px abaixo do menu fixo (nav.w-nav bottom=128px em viewport 776px) */
     z-index: 3;
     transform: translateX(110%); /* estado inicial: fora da tela */
     pointer-events: none;
