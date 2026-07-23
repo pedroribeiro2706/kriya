@@ -4,9 +4,13 @@
     --lum-green: #7ed957;
     --lum-title-idle: #c9c9c9;
     --lum-text-ink: #303030;
-    /* Os dois polígonos têm 5 vértices — obrigatório para o GSAP interpolar */
+    /* Os dois polígonos têm 5 vértices — obrigatório para o GSAP interpolar.
+       A ordem dos vértices do clip-full pareia com o clip-on (interpolação é
+       posicional): o vértice da boca da cúpula (1º) viaja para o canto superior
+       DIREITO — mesma direção da saída do .lum-rig — e a diagonal superior do
+       facho abre em leque com dobradiça na boca. Reordenar quebra a coreografia. */
     --lum-clip-on: polygon(75.0% 31.2%, 74.9% 60%, 74.9% 100%, -2.1% 100%, -2.1% 56%);
-    --lum-clip-full: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%);
+    --lum-clip-full: polygon(100% 0%, 100% 50%, 100% 100%, 0% 100%, 0% 0%);
     position: relative;
     height: 100vh;
     overflow: hidden;

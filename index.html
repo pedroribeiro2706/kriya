@@ -1755,7 +1755,9 @@
                         .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
                         .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
                         .fromTo(".lum-heading-wrap", { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -30, duration: 8, immediateRender: false }, 85)
-                        .to(".lum-beam",         { clipPath: LUM_CLIP_FULL, duration: 15 }, 85)
+                        // Beam e rig na MESMA janela: o vértice da boca (1º do polígono)
+                        // acompanha a cúpula saindo pela direita — abre o leque ancorado nela
+                        .to(".lum-beam",         { clipPath: LUM_CLIP_FULL, duration: 12 }, 87)
                         .to(".lum-rig",          { x: "110%", duration: 12 }, 87);
 
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
