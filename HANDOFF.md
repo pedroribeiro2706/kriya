@@ -1,6 +1,36 @@
-# HANDOFF — Retomada do projeto (2026-07-19, atualizado 2026-07-20)
+# HANDOFF — Retomada do projeto (2026-07-19, atualizado 2026-07-23)
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
+
+## Atualização 23/07/2026 — calibração aprovada; saída melhorada; decisão: luminária SVG articulada com facho embutido. AGUARDANDO SVG DO PEDRO
+
+**UAT do Pedro (manhã) aprovou:** posição do facho, entrada da luminária e pisca. A calibração que estava pendente no working tree desde 21/07 (polígono do `--lum-clip-on` + `.lum-rig` ancorada no rodapé com 82.2vh) foi commitada como `8b54bed`.
+
+**Bug reportado na saída da seção:** quando a luminária desliza para fora e o facho abre até a tela branca, o facho se desconecta visualmente da cúpula — cria formas próprias, "luz sem fonte" (sequência `references/secao-luminaria-pos-fix-04a..h.png`). Causa raiz verificada no código: a interpolação do clip-path é vértice a vértice e o mapeamento era ruim — o vértice da boca da cúpula tinha destino no canto superior ESQUERDO (direção oposta à saída do rig, que vai para a direita), e as janelas de tempo eram dessincronizadas (beam 85–100, rig 87–99).
+
+**Fix intermediário aplicado (commit `7772c6d`):** `--lum-clip-full` reordenado (vértice da boca → canto superior direito; o leque abre com dobradiça na boca) + tweens do beam e do rig na mesma janela (87–99; a `lumMaster` já tem `defaults: { ease: "none" }`). Segunda UAT: "ficou melhor, mas ainda há desconexão" (`references/secao-luminaria-pos-fix-05a..g.png`). As desconexões residuais são ESTRUTURAIS, não calibráveis de forma robusta no método atual: (1) vertical — o vértice de origem sobe até o topo da tela enquanto a boca da cúpula mantém a altura durante o slide; (2) velocidade — a cúpula percorre 110% da largura do rig enquanto o vértice percorre só 25vw (~1,5× mais lento); no fim sobra coluna preta à direita sem fonte de luz.
+
+**Decisão alinhada com o Pedro:** substituir o PNG (`luminaria.png`) por um **SVG articulado com o facho como path DENTRO do grupo da cúpula**. O facho deixa de ser uma camada HTML separada tentando "adivinhar" onde a boca está: como filho do grupo da cúpula ele herda rotação e translação — conexão perfeita por construção, em qualquer viewport. A animação de saída vira 2 fases, conforme a sequência de referência que o Pedro montou no Photoshop (`references/animacao-luminaria-ideal-01..05.png`):
+
+- **Fase A** — luminária parada; a cúpula GIRA para cima (pivô na articulação cúpula-braço) e o leque gira junto, abrindo (morph de path — MorphSVG é gratuito desde o GSAP 3.13) até a aresta superior do leque encostar no topo da tela.
+- **Fase B** — o rig desliza para fora pela direita; a cunha preta restante (acima/abaixo da cúpula) sai junto com ela; tela termina 100% branca.
+
+**O Pedro vai produzir o SVG** (ele tem o vetor fonte). Especificação combinada do arquivo único:
+- Grupos/camadas nomeados (viram IDs no export): `base`, `braco`, `cupula`; o path `facho` DENTRO da camada `cupula`.
+- Pose idêntica ao PNG atual (troca 1:1, preserva a calibração de entrada aprovada).
+- Facho desenhado no estado aceso atual (como `animacao-luminaria-ideal-01.png`), com os raios estendidos para bem além da tela (≥3× o tamanho da luminária). Opcional: segunda camada oculta `facho-aberto` com o leque da fase A aberta (ideal-03) para o morph ser fiel ao desenho do Pedro.
+- Marcador de pivô: círculo pequeno na articulação cúpula-braço, camada `pivo-cupula` (o código lê a posição e o esconde). Opcional: `pivo-braco`.
+- Sem clipping masks/efeitos raster; paths chapados; cores do PNG atual, facho branco.
+- Export Illustrator: SVG com Object IDs = Layer Names; o facho pode vazar do artboard.
+
+**O que NÃO muda:** entrada, flicker, textos/títulos, e o desenho do facho aceso aprovado (o path inicial do facho replica os ângulos do `--lum-clip-on` atual).
+
+**Próximo passo (quando o SVG chegar):** plano de integração — trocar o PNG no `.lum-rig` pelo SVG inline; decidir o destino do `.lum-beam`/clip-path atuais (o facho passa a viver no SVG); adaptar o flicker para o novo alvo; reanimar a saída em 2 fases; verificação visual a cada etapa antes de declarar pronto.
+
+**Notas operacionais desta sessão:**
+- A extensão claude-in-chrome ficou DESCONECTADA a sessão inteira — as verificações visuais foram do Pedro, via screenshots salvos em `references/`. Reconectar na próxima sessão se possível.
+- `references/` passou a ser versionada no git (screenshots de UAT, sequência ideal e PSDs de trabalho, ~11 MB).
+- Pendência pequena: decidir se `.claude/` (skills locais do repo, ex. `gsap`) entra no git — está untracked.
 
 ## Atualização 20/07/2026 (terceira parte) — bug do título corrigido + bug crítico novo encontrado e corrigido
 
