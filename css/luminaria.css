@@ -99,7 +99,7 @@
 .lum-text.is-active { opacity: 1; visibility: visible; }
 .lum-text li { margin-bottom: 0.35rem; }
 
-/* Luminária — slot substituível (futuro: SVG articulado no lugar do PNG) */
+/* Luminária — SVG articulado inline (substituiu o PNG em 25/07; caixa idêntica) */
 .lum-rig {
     position: absolute;
     bottom: 0;
@@ -109,10 +109,17 @@
     transform: translateX(110%); /* estado inicial: fora da tela */
     pointer-events: none;
 }
-.lum-rig img {
+.lum-rig svg {
     height: 100%;
     width: auto;
     display: block;
+    overflow: visible; /* o #facho vaza da caixa por construção */
+}
+/* Facho do SVG dormente: a luz atual é o .lum-beam (HTML), que também mascara
+   os títulos/textos. A migração da luz para o SVG acontece junto com a nova
+   coreografia de saída. */
+.lum-rig #facho {
+    visibility: hidden;
 }
 
 /* Alternância desktop/mobile: luminária é experiência desktop */

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1125.46 468.58" overflow="visible">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: #bcbcd1;
+      }
+    </style>
+  </defs>
+  <g id="luminaria">
+    <g id="base">
+      <polygon id="haste" class="cls-2" points="1024.55 454.74 1024.55 442.99 998.85 442.99 998.85 82.94 985.83 82.94 985.83 442.99 960.04 442.99 960.04 454.74 897.75 454.74 897.75 467.69 960.04 467.69 985.83 467.69 998.85 467.69 1024.55 467.69 1087.5 467.69 1087.5 454.74 1024.55 454.74"/>
+    </g>
+    <g id="braco" transform-origin="992.23px 110.77px">
+      <rect id="braco-shape" class="cls-2" x="999.02" y="-22.25" width="13.02" height="287.88" transform="translate(312.81 860.64) rotate(-53.75)"/>
+      <circle id="eixo-braco" class="cls-2" cx="992.23" cy="110.77" r="17.88"/>
+      <g id="cupula" transform-origin="871.49px 22.98px">
+        <path id="facho" class="cls-1" d="M0,205.29c15.45-2.61,811.37-131.95,842.21-137.15,1.65,135.25,5.67,265.19,7.31,400.44L0,467.69V205.29Z"/>
+        <path id="cupula-shape" class="cls-2" d="M892.42,54.38l-52.34-42.38-23.99,29.62c-27.55-5.98-57.38,3.41-76.33,26.81l119.85,97.05c19.44-24.01,22.08-56.15,9.43-82.23l23.38-28.87Z"/>
+        <circle id="eixo-cupula" class="cls-2" cx="871.49" cy="22.98" r="22.98"/>
+      </g>
+    </g>
+  </g>
+</svg>

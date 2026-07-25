@@ -554,7 +554,29 @@
                     </div>
                 </div>
             </div>
-            <div class="lum-rig"><img src="assets/luminaria.png" alt="" aria-hidden="true"></div>
+            <!-- Luminária SVG articulada (fonte: references/luminaria.svg).
+                 viewBox recortado para reproduzir a caixa do PNG aprovado: bbox opaco
+                 868x1054 + padding 17px esq / 15px dir / 26px topo (PNG 900x1080).
+                 Cor #625e5e amostrada do PNG. O #facho vaza da caixa (overflow visible)
+                 e fica DORMENTE (oculto via CSS) até a migração da luz na saída. -->
+            <div class="lum-rig">
+                <svg class="lum-svg" viewBox="732.21 -11.54 399.92 479.23" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <g id="lum-svg-root">
+                        <g id="base">
+                            <polygon id="haste" fill="#625e5e" points="1024.55 454.74 1024.55 442.99 998.85 442.99 998.85 82.94 985.83 82.94 985.83 442.99 960.04 442.99 960.04 454.74 897.75 454.74 897.75 467.69 960.04 467.69 985.83 467.69 998.85 467.69 1024.55 467.69 1087.5 467.69 1087.5 454.74 1024.55 454.74"/>
+                        </g>
+                        <g id="braco" transform-origin="992.23px 110.77px">
+                            <rect id="braco-shape" fill="#625e5e" x="999.02" y="-22.25" width="13.02" height="287.88" transform="translate(312.81 860.64) rotate(-53.75)"/>
+                            <circle id="eixo-braco" fill="#625e5e" cx="992.23" cy="110.77" r="17.88"/>
+                            <g id="cupula" transform-origin="871.49px 22.98px">
+                                <path id="facho" fill="#fff" d="M0,205.29c15.45-2.61,811.37-131.95,842.21-137.15,1.65,135.25,5.67,265.19,7.31,400.44L0,467.69V205.29Z"/>
+                                <path id="cupula-shape" fill="#625e5e" d="M892.42,54.38l-52.34-42.38-23.99,29.62c-27.55-5.98-57.38,3.41-76.33,26.81l119.85,97.05c19.44-24.01,22.08-56.15,9.43-82.23l23.38-28.87Z"/>
+                                <circle id="eixo-cupula" fill="#625e5e" cx="871.49" cy="22.98" r="22.98"/>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+            </div>
         </section>
         <section id="service" class="section-services">
             <div class="service-columns">
