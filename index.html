@@ -515,6 +515,9 @@
                 <h2 class="lum-heading">O que podemos <span class="lum-heading-accent">fazer por você</span>, hoje?</h2>
                 <p class="lum-heading-sub">Somos contadores de histórias visuais, criando experiências que conectam profundamente e estimulam a criatividade.</p>
             </div>
+            <!-- Fundo preto da seção como ELEMENTO: na coreografia de saída ele
+                 desliza para fora com o rig, revelando o branco por trás -->
+            <div class="lum-curtain"></div>
             <div class="lum-beam">
                 <div class="lum-beam-inner">
                     <div class="lum-titles">
@@ -569,7 +572,7 @@
                             <rect id="braco-shape" fill="#625e5e" x="999.02" y="-22.25" width="13.02" height="287.88" transform="translate(312.81 860.64) rotate(-53.75)"/>
                             <circle id="eixo-braco" fill="#625e5e" cx="992.23" cy="110.77" r="17.88"/>
                             <g id="cupula" transform-origin="871.49px 22.98px">
-                                <path id="facho" fill="#fff" d="M0,205.29c15.45-2.61,811.37-131.95,842.21-137.15,1.65,135.25,5.67,265.19,7.31,400.44L0,467.69V205.29Z"/>
+                                <path id="facho" fill="#fff" d="M-1800,509.37 L0,205.29 C15.45,202.68 811.37,73.34 842.21,68.14 C843.86,203.39 847.88,333.33 849.52,468.58 L849.52,1400 L-1800,1400 Z"/>
                                 <path id="cupula-shape" fill="#625e5e" d="M892.42,54.38l-52.34-42.38-23.99,29.62c-27.55-5.98-57.38,3.41-76.33,26.81l119.85,97.05c19.44-24.01,22.08-56.15,9.43-82.23l23.38-28.87Z"/>
                                 <circle id="eixo-cupula" fill="#625e5e" cx="871.49" cy="22.98" r="22.98"/>
                             </g>
@@ -1714,12 +1717,15 @@
 
                     // --- Luz liga: flicker de lâmpada + revelação (disparada, não scrubbed) ---
                     const lightOn = gsap.timeline({ paused: true });
+                    // A "luz" é dupla: #facho (SVG, o desenho visível da luz) e .lum-beam
+                    // (container transparente do conteúdo) — piscam juntos, como antes.
+                    const luz = [".lum-beam", "#facho"];
                     lightOn
-                        .fromTo(".lum-beam", { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" })
-                        .to(".lum-beam", { opacity: 0.15, duration: 0.06, ease: "none" })
-                        .to(".lum-beam", { opacity: 1, duration: 0.05, ease: "none" })
-                        .to(".lum-beam", { opacity: 0.4, duration: 0.07, ease: "none" })
-                        .to(".lum-beam", { opacity: 1, duration: 0.12, ease: "none" })
+                        .fromTo(luz, { opacity: 0 }, { opacity: 1, duration: 0.08, ease: "none" })
+                        .to(luz, { opacity: 0.15, duration: 0.06, ease: "none" })
+                        .to(luz, { opacity: 1, duration: 0.05, ease: "none" })
+                        .to(luz, { opacity: 0.4, duration: 0.07, ease: "none" })
+                        .to(luz, { opacity: 1, duration: 0.12, ease: "none" })
                         .fromTo(".lum-heading-wrap",
                             { autoAlpha: 0, y: 24 },
                             { autoAlpha: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.05");
@@ -1770,17 +1776,25 @@
                             .to(lumTexts[i + 1],  { autoAlpha: 1, duration: 3 }, t + 1);
                     });
 
-                    // Fase 3 (85–100): conteúdo sai, facho abre até a tela branca, luminária sai
-                    const LUM_CLIP_FULL = getComputedStyle(document.querySelector(".lum-section")).getPropertyValue("--lum-clip-full").trim();
+                    // Fase 3 (85–100): conteúdo sai; coreografia articulada da saída
+                    // (referência visual: references/animacao-luminaria-ideal-01..05.png).
+                    // Movimentos SOBREPOSTOS: o rig já desliza enquanto a cúpula gira no
+                    // pivô; o braço desce a haste verticalizando (para a cúpula não subir
+                    // atrás do menu); o facho abre (interpolação nativa do "d" — mesma
+                    // estrutura de comandos nos dois paths); a cortina preta varre com o rig.
+                    const FACHO_ABERTO = "M-1772.89,-512.55 L9.95,-120.19 C25.25,-116.83 811.67,61.41 842.21,68.14 C843.86,203.39 847.88,333.33 849.52,468.58 L849.52,1400 L-1800,1400 Z";
 
                     lumMaster
                         .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
                         .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
                         .fromTo(".lum-heading-wrap", { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -30, duration: 8, immediateRender: false }, 85)
-                        // Beam e rig na MESMA janela: o vértice da boca (1º do polígono)
-                        // acompanha a cúpula saindo pela direita — abre o leque ancorado nela
-                        .to(".lum-beam",         { clipPath: LUM_CLIP_FULL, duration: 12 }, 87)
-                        .to(".lum-rig",          { x: "110%", duration: 12 }, 87);
+                        // power1.in: desliza pouco no início (frames 01–03) e acelera na
+                        // saída (04–05) — mantém a cúpula em cena até a cortina alcançá-la
+                        .to(".lum-rig",          { x: "110%", duration: 15, ease: "power1.in" }, 85)
+                        .to("#cupula",           { rotation: -35, svgOrigin: "871.49 22.98", duration: 11 }, 85)
+                        .to("#braco",            { rotation: 53.75, y: 200, svgOrigin: "992.23 110.77", duration: 13 }, 85)
+                        .to("#facho",            { attr: { d: FACHO_ABERTO }, duration: 8 }, 85)
+                        .to(".lum-curtain",      { x: "135%", duration: 10 }, 90);
 
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
                     lumMaster.set({}, {}, 100);

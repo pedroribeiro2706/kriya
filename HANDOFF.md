@@ -2,6 +2,39 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
+## Atualização 25/07/2026 — SVG articulado INTEGRADO (Etapas 1 e 2 implementadas). AGUARDANDO AJUSTES FINAIS DO UAT DO PEDRO
+
+**Pedro entregou o SVG** (`references/luminaria.svg` + `luminaria.ai`, versionados). Reestruturado nesta sessão: grupos ANINHADOS `base` | `braco` (pivô 992.23,110.77) > `cupula` (pivô 871.49,22.98) > `facho` — cadeia cinemática: cada elo carrega os de baixo por construção. Aninhamento cupula-dentro-de-braco foi decisão da sessão (Pedro confirmou): quando o braço desce/gira, a cúpula e o facho acompanham automaticamente.
+
+**Correção de entendimento da saída (Pedro, confirmada nos frames):** NÃO são 2 fases sequenciais — é uma coreografia única com movimentos SOBREPOSTOS: o rig já desliza para fora enquanto a cúpula gira; o eixo do braço desce a haste verticalizando o braço (senão a cúpula subiria atrás do menu fixo); o leque ABRE (ângulo de abertura aumenta — morph, não rotação rígida); a cunha preta sai junto. Sequência-alvo: `references/animacao-luminaria-ideal-01..05.png`.
+
+**Etapa 1 — troca estática (commit `ab2a9d3`, UAT APROVADO 25/07):**
+- SVG inline no `.lum-rig` no lugar do `<img>` PNG. viewBox recortado `732.21 -11.54 399.92 479.23` replica a caixa do PNG aprovado (bbox opaco 868x1054 + padding 17px esq/15 dir/26 topo no PNG 900x1080) — caixa de layout idêntica, `translateX(%)` de entrada/saída preservados.
+- Cor `#625e5e` amostrada do PNG (o export do Illustrator vinha com `#bcbcd1` — a fonte `references/luminaria.svg` ainda tem a cor antiga; o inline é a verdade).
+- Ids no inline: grupo raiz renomeado para `lum-svg-root` (a section já usa `id="luminaria"`); demais preservados (`base`, `braco`, `cupula`, `facho`, `haste`, `eixo-*`, `braco-shape`, `cupula-shape`).
+
+**Etapa 2 — migração da luz + coreografia nova (implementada nesta sessão; commit desta atualização; UAT final PENDENTE):**
+- `#facho` agora é a luz visível, com raios estendidos ~3x (path `M-1800,509.37 L0,205.29 C... 849.52,468.58 L849.52,1400 L-1800,1400 Z` — a extensão continua a tangente exata do desenho do Pedro; sem fresta em nenhum viewport).
+- `.lum-beam` virou container TRANSPARENTE do conteúdo (títulos/textos): mantém o clip `--lum-clip-on` (corte do carrossel na diagonal), z-index 1→4 (conteúdo SOBRE a luz). `.lum-heading-wrap` z 2→4. Flicker (lightOn) retargetado: `const luz = [".lum-beam", "#facho"]` — piscam juntos.
+- Fundo preto virou ELEMENTO: `.lum-curtain` (z1, `clip-path` com borda esquerda inclinada); `.lum-section` background agora é `#fff`. A cunha preta dos frames 04–05 emerge da interseção curtain × área-não-coberta-pelo-facho — não é desenhada à mão.
+- Saída nova (substituiu `clipPath: LUM_CLIP_FULL` + rig @87–99; a const LUM_CLIP_FULL foi removida do JS; as vars `--lum-clip-full` seguem no CSS sem uso, limpar depois):
+  - `.lum-rig` x:110% dur 15 @85, ease `power1.in` (devagar nos frames 01–03, acelera 04–05)
+  - `#cupula` rotation −35 svgOrigin "871.49 22.98" dur 11 @85
+  - `#braco` rotation +53.75 (verticaliza; o rect nasce a −53.75) + y:+200 (desce a haste), svgOrigin "992.23 110.77", dur 13 @85
+  - `#facho` attr d → FACHO_ABERTO dur 8 @85 — abertura de 22° na boca; interpolação NATIVA do GSAP (os dois paths têm a MESMA estrutura de comandos M L C C L L Z — não precisou de MorphSVG)
+  - `.lum-curtain` x:135% dur 10 @90
+- Verificação por estados forçados no browser: 0.50≈frame 01, 0.88≈02, 0.93≈03, 0.96≈04/05, 1.0 = tela 100% branca ✓. Junção boca↔facho conectada em TODOS os estados (herança por construção). Zoom confirmou: sem gap real (o que parecia gap era compressão JPEG do screenshot).
+
+**Delta conhecido vs a referência:** no ~frame 04 a cunha preta ideal do Pedro é mais LARGA (o escuro atrás/abaixo da cúpula desce grosso até a base); no implementado o facho aberto ilumina mais o canto inferior-direito. Ajustável na geometria do FACHO_ABERTO se o Pedro quiser fiel ao Photoshop.
+
+**PENDENTE — PRÓXIMA SESSÃO COMEÇA AQUI:** Pedro viu o resultado ("está ficando interessante"), saiu antes do UAT completo e VAI EXPLICAR OS AJUSTES que ainda quer. Parâmetros calibráveis prontos: ângulos (−35 cúpula / +53.75 braço / 22° abertura), descida do braço (+200), janelas e durations dos 5 tweens, ease do rig, velocidade/inclinação da cortina, geometria do FACHO_ABERTO.
+
+**Notas operacionais:**
+- claude-in-chrome FUNCIONOU (Pedro abriu o Chrome; nas sessões anteriores estava desconectada).
+- Pilotagem determinística da timeline em aba oculta (throttled): helper `window.__goLum(p)` via console — `scrollTo(start + p*(end-start))` + `ScrollTrigger.update()` + `st.getTween().progress(1)` (mata a suavização do scrub) + `gsap.ticker.tick()`. Para screenshots com a luz acesa: matar a timeline do flicker (kill nos tweens de opacity de `#facho`/`.lum-beam`) e `gsap.set(opacity 1)` — senão o flicker fica oscilando em câmera lenta pelos ticks manuais.
+- Scroll programático: usar `body/html overflow 'visible'` — com `'auto'` o `document.scrollingElement` ficou null e `window.scrollTo` parou de funcionar.
+- Vite dev na 5173 (`npm run dev`).
+
 ## Atualização 23/07/2026 — calibração aprovada; saída melhorada; decisão: luminária SVG articulada com facho embutido. AGUARDANDO SVG DO PEDRO
 
 **UAT do Pedro (manhã) aprovou:** posição do facho, entrada da luminária e pisca. A calibração que estava pendente no working tree desde 21/07 (polígono do `--lum-clip-on` + `.lum-rig` ancorada no rodapé com 82.2vh) foi commitada como `8b54bed`.
