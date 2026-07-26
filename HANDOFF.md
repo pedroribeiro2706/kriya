@@ -2,6 +2,18 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
+## Atualização 26/07/2026 — coreografia de saída FINALIZADA e APROVADA ("Perfeito!")
+
+Três rodadas de calibração com UAT do Pedro (sequências `ajuste-facho-*.png` em `references/`):
+
+1. **Cúpula não girava** — causa: erro de sinal meu na composição de rotações (convenção y-down). A intuição do Pedro estava certa: a cúpula NÃO precisa de giro próprio — ela (e o facho) herdam o giro do braço, como numa luminária real. Tween da cúpula removido.
+2. **Facho girava além do braço + boca acima da horizontal + quina** — morph de abertura REMOVIDO (cadeia 100% rígida: um único giro, o do braço, comanda tudo); braço **+51°** (não +53.75): é o giro que deixa a corda da boca vertical exata na tela. **Metodologia de verificação de ângulos** (após o erro de sinal): transformar os extremos da corda da boca `(739.76,68.43)-(859.61,165.48)` via `getScreenCTM` e medir a linha resultante — alvo 90°, desvio zero confirmado. Commit `3fb7229`.
+3. **O "retângulo"** — a cortina em movimento varria a cena com a borda vertical do próprio elemento (aprendizado: `clip-path` só RECORTA o elemento, não estende o fundo — o clip inclinado era inócuo). Solução (proposta do Pedro): **cortina ESTÁTICA**; o rig desliza **170%** (`power2.in` — trajeto até t95 ≈ igual ao aprovado) e as fronteiras oblíquas do próprio facho engolem o preto até a tela ficar branca exatamente em t100. Leque estendido (raios −3000, base 2200) para a ponta nunca entrar na tela. Cobertura verificada analiticamente (folga 108px). Commit `fa18db1`.
+
+**Estado FINAL da saída (t85–100), 3 tweens:** rig `x:170% dur15 power2.in @85`; braço `rotation:+51 y:+200 svgOrigin(992.23,110.77) dur10 @85` (cúpula e facho herdam tudo); fades de conteúdo/heading `@85`. Cortina e beam estáticos. Feature da luminária COMPLETA: entrada, pisca, carrossel e saída aprovados.
+
+**Deploy/servidor:** repo SEM config de deploy (verificado 26/07: sem vercel.json, .vercel/, workflows, netlify). Consulta à conta Vercel do Pedro falhou por rate-limit da integração — pendente decidir onde publicar.
+
 ## Atualização 25/07/2026 — SVG articulado INTEGRADO (Etapas 1 e 2 implementadas). AGUARDANDO AJUSTES FINAIS DO UAT DO PEDRO
 
 **Pedro entregou o SVG** (`references/luminaria.svg` + `luminaria.ai`, versionados). Reestruturado nesta sessão: grupos ANINHADOS `base` | `braco` (pivô 992.23,110.77) > `cupula` (pivô 871.49,22.98) > `facho` — cadeia cinemática: cada elo carrega os de baixo por construção. Aninhamento cupula-dentro-de-braco foi decisão da sessão (Pedro confirmou): quando o braço desce/gira, a cúpula e o facho acompanham automaticamente.

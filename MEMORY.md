@@ -5,7 +5,7 @@ Fatos-chave do projeto (detalhes e narrativa completa em `HANDOFF.md`):
 - Local canônico do código: `G:\Pedro\Dev\Kriya` | GitHub: https://github.com/pedroribeiro2706/kriya (público, conta pedroribeiro2706)
 - Rodar: `npm run dev` → http://localhost:5173/versoes.html (estação de testes) ou /index.html (cópia de trabalho)
 - `portfolio.html` = página principal publicada (export Webflow + GSAP inline no fim, ~linha 1379); desde 20/07 `index.html` é a CÓPIA DE TRABALHO dele com a seção da luminária (o protótipo antigo virou `index-old-02.html`)
-- Feature em andamento: seção da luminária (`index.html` + `css/luminaria.css`) — SVG articulado INTEGRADO em 25/07 (Etapa 1: troca do PNG, UAT aprovado, `ab2a9d3`; Etapa 2: luz migrada para o `#facho` + coreografia de saída nova, implementada). AGUARDANDO ajustes finais que o Pedro vai apontar (ver HANDOFF.md, atualização 25/07). NÃO apagar arquivos de teste antigos
+- Seção da luminária (`index.html` + `css/luminaria.css`) — **COMPLETA e APROVADA em 26/07** (entrada, pisca, carrossel e saída; commits `ab2a9d3`..`fa18db1`). Próximo marco: integrar ao `portfolio.html` e decidir deploy (sem servidor configurado; ver HANDOFF 26/07). NÃO apagar arquivos de teste antigos
 - Guias visuais em `references/`: `animacao-luminaria-ideal-01..05.png` = sequência-alvo da saída (montada pelo Pedro no Photoshop); `secao-luminaria-pos-fix-*.png` = registros de UAT
 - Pasta antiga no OneDrive (`...\Kriya Design\Portfolio`) = arquivo morto de assets pesados (Photoshop/ e Videos/, ~10 GB, fora do git); sem .git; não editar código lá
 - test-video-02-bkp-02.html ≡ test-video-02.html (idênticos); a variação está nos JS
