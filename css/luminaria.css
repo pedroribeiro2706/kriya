@@ -20,14 +20,16 @@
 }
 
 /* Cortina preta — o "fundo" da seção durante entrada e leitura. Na saída,
-   desliza para a direita junto com o rig. A borda esquerda é inclinada
-   (cunha), conforme a sequência de referência (frames 04–05). */
+   desliza para a direita junto com o rig. A borda esquerda tem a MESMA
+   inclinação da borda inferior do facho girado (+51°: 1px desce, 1.235px à
+   esquerda => recuo de 123.5vh na base): quando a cortina ultrapassa o facho,
+   a fronteira do preto mantém a inclinação — sem "quina" (UAT 26/07). */
 .lum-curtain {
     position: absolute;
     inset: 0;
     z-index: 1;
     background: var(--lum-bg);
-    clip-path: polygon(-25% 0%, 150% 0%, 150% 100%, -35% 100%);
+    clip-path: polygon(-25% 0%, 150% 0%, 150% 100%, calc(-25% - 123.5vh) 100%);
 }
 
 /* Título da seção — fora do facho, branco sobre preto (mockup) */

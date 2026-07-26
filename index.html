@@ -1778,12 +1778,11 @@
 
                     // Fase 3 (85–100): conteúdo sai; coreografia articulada da saída
                     // (referência visual: references/animacao-luminaria-ideal-01..05.png).
-                    // Movimentos SOBREPOSTOS: o rig já desliza enquanto a cúpula gira no
-                    // pivô; o braço desce a haste verticalizando (para a cúpula não subir
-                    // atrás do menu); o facho abre (interpolação nativa do "d" — mesma
-                    // estrutura de comandos nos dois paths); a cortina preta varre com o rig.
-                    const FACHO_ABERTO = "M-1772.89,-512.55 L9.95,-120.19 C25.25,-116.83 811.67,61.41 842.21,68.14 C843.86,203.39 847.88,333.33 849.52,468.58 L849.52,1400 L-1800,1400 Z";
-
+                    // Movimentos SOBREPOSTOS: o rig já desliza enquanto o braço desce a
+                    // haste e verticaliza; a cúpula E o facho herdam o giro do braço
+                    // (relação boca<->facho 100% rígida — sem morph: UAT de 26/07 mostrou
+                    // que abertura independente descola o facho da mecânica); a cortina
+                    // preta varre a tela junto com o rig.
                     lumMaster
                         .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
                         .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
@@ -1791,10 +1790,17 @@
                         // power1.in: desliza pouco no início (frames 01–03) e acelera na
                         // saída (04–05) — mantém a cúpula em cena até a cortina alcançá-la
                         .to(".lum-rig",          { x: "110%", duration: 15, ease: "power1.in" }, 85)
-                        .to("#cupula",           { rotation: -35, svgOrigin: "871.49 22.98", duration: 11 }, 85)
-                        .to("#braco",            { rotation: 53.75, y: 200, svgOrigin: "992.23 110.77", duration: 13 }, 85)
-                        .to("#facho",            { attr: { d: FACHO_ABERTO }, duration: 8 }, 85)
-                        .to(".lum-curtain",      { x: "135%", duration: 10 }, 90);
+                        // A cúpula NÃO tem giro próprio: ela (e o facho) herdam o giro do
+                        // braço, como numa luminária real (percepção do Pedro, confirmada
+                        // por medição em 26/07). +51 é o giro que deixa a CORDA DA BOCA
+                        // vertical na tela (= luz horizontal exata); o braço fica a 2.75°
+                        // da vertical — imperceptível. Verificação objetiva: transformar os
+                        // extremos da corda da boca (739.76,68.43)-(859.61,165.48) via
+                        // getScreenCTM e conferir a linha resultante a 90°.
+                        .to("#braco",            { rotation: 51, y: 200, svgOrigin: "992.23 110.77", duration: 10 }, 85)
+                        // 190%: a borda inclinada do clip (recuada 123.5vh) precisa
+                        // viajar mais para sair completamente pela direita
+                        .to(".lum-curtain",      { x: "190%", duration: 10 }, 90);
 
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
                     lumMaster.set({}, {}, 100);
