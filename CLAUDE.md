@@ -6,12 +6,18 @@ Site one-page de portfólio (Pedro Ribeiro / Kriya Design) com animações GSAP.
 
 ## Como rodar
 - `npm run dev` → abre em http://localhost:5173/
+- **Página principal**: http://localhost:5173/index.html (desde 26/07/2026 o index É a página canônica — ver "Arquivos-chave")
 - **Estação de testes**: http://localhost:5173/versoes.html (índice de todas as versões do site)
-- **Página principal**: http://localhost:5173/portfolio.html
+
+## Deploy (Vercel)
+- Projeto `kriya` na conta Vercel do Pedro (team pedroribeiro2706s-projects), conectado ao repo GitHub
+- **Cada push em `main` = deploy automático de produção** (site estático puro, sem build — `vercel.json` força isso; NÃO deixar a Vercel autodetectar "Vite")
+- URL de produção: https://kriya-pedroribeiro2706s-projects.vercel.app
 
 ## Arquivos-chave
-- `portfolio.html` — a página PRINCIPAL do site (não é o index.html!). Export do Webflow + toda a lógica GSAP num `<script>` inline no final do arquivo (~linha 1379)
-- `index.html`, `test-video-02.html`, `v-*.html`, `back-ups/` — protótipos e tentativas da **seção da luminária** (feature em desenvolvimento). **NÃO APAGAR** — a limpeza foi deliberadamente suspensa
+- `index.html` — a página PRINCIPAL e canônica do site (export Webflow + GSAP inline no fim + seção da luminária COMPLETA). Convenção adotada em 26/07/2026: index.html na raiz, como serve a Vercel
+- `portfolio.html` — versão ANTIGA da página principal (sem a seção da luminária); mantida como legado, não editar
+- `test-video-02.html`, `v-*.html`, `back-ups/` — protótipos e tentativas antigas da seção da luminária. **NÃO APAGAR** — a limpeza foi deliberadamente suspensa
 - `versoes.html` — estação de testes que lista e explica todas as versões
 - `js/ScrollSmoother.min.js` e `js/SplitText.min.js` — plugins GSAP locais (gratuitos desde o GSAP 3.13)
 
