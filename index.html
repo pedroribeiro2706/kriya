@@ -572,7 +572,7 @@
                             <rect id="braco-shape" fill="#625e5e" x="999.02" y="-22.25" width="13.02" height="287.88" transform="translate(312.81 860.64) rotate(-53.75)"/>
                             <circle id="eixo-braco" fill="#625e5e" cx="992.23" cy="110.77" r="17.88"/>
                             <g id="cupula" transform-origin="871.49px 22.98px">
-                                <path id="facho" fill="#fff" d="M-1800,509.37 L0,205.29 C15.45,202.68 811.37,73.34 842.21,68.14 C843.86,203.39 847.88,333.33 849.52,468.58 L849.52,1400 L-1800,1400 Z"/>
+                                <path id="facho" fill="#fff" d="M-3000,712.08 L0,205.29 C15.45,202.68 811.37,73.34 842.21,68.14 C843.86,203.39 847.88,333.33 849.52,468.58 L849.52,2200 L-3000,2200 Z"/>
                                 <path id="cupula-shape" fill="#625e5e" d="M892.42,54.38l-52.34-42.38-23.99,29.62c-27.55-5.98-57.38,3.41-76.33,26.81l119.85,97.05c19.44-24.01,22.08-56.15,9.43-82.23l23.38-28.87Z"/>
                                 <circle id="eixo-cupula" fill="#625e5e" cx="871.49" cy="22.98" r="22.98"/>
                             </g>
@@ -1787,9 +1787,12 @@
                         .to(".lum-titles",       { autoAlpha: 0, y: () => -3 * stepY() - 80, duration: 8 }, 85)
                         .to(".lum-texts",        { autoAlpha: 0, duration: 8 }, 85)
                         .fromTo(".lum-heading-wrap", { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -30, duration: 8, immediateRender: false }, 85)
-                        // power1.in: desliza pouco no início (frames 01–03) e acelera na
-                        // saída (04–05) — mantém a cúpula em cena até a cortina alcançá-la
-                        .to(".lum-rig",          { x: "110%", duration: 15, ease: "power1.in" }, 85)
+                        // power2.in + 170%: até t95 o trajeto é ~igual ao aprovado com
+                        // power1.in + 110% ((10/15)^3*1.70 ≈ (10/15)^2*1.10); depois o rig
+                        // segue além dos 110% para o facho — sozinho — engolir o preto de
+                        // cima e de baixo até a tela ficar toda branca EXATAMENTE em t100
+                        // (a cortina é fixa; 170% dá folga de viewport sobre o mínimo 165%)
+                        .to(".lum-rig",          { x: "170%", duration: 15, ease: "power2.in" }, 85)
                         // A cúpula NÃO tem giro próprio: ela (e o facho) herdam o giro do
                         // braço, como numa luminária real (percepção do Pedro, confirmada
                         // por medição em 26/07). +51 é o giro que deixa a CORDA DA BOCA
@@ -1797,10 +1800,9 @@
                         // da vertical — imperceptível. Verificação objetiva: transformar os
                         // extremos da corda da boca (739.76,68.43)-(859.61,165.48) via
                         // getScreenCTM e conferir a linha resultante a 90°.
-                        .to("#braco",            { rotation: 51, y: 200, svgOrigin: "992.23 110.77", duration: 10 }, 85)
-                        // 190%: a borda inclinada do clip (recuada 123.5vh) precisa
-                        // viajar mais para sair completamente pela direita
-                        .to(".lum-curtain",      { x: "190%", duration: 10 }, 90);
+                        .to("#braco",            { rotation: 51, y: 200, svgOrigin: "992.23 110.77", duration: 10 }, 85);
+                    // A cortina NÃO anima na saída: o facho, deslizando com o rig,
+                    // cobre a tela e "apaga" o preto sozinho (ver .lum-curtain no CSS)
 
                     // Garante duração total 100 desde já (fases seguintes ocupam 20–100)
                     lumMaster.set({}, {}, 100);
