@@ -12,7 +12,7 @@ Três rodadas de calibração com UAT do Pedro (sequências `ajuste-facho-*.png`
 
 **Estado FINAL da saída (t85–100), 3 tweens:** rig `x:170% dur15 power2.in @85`; braço `rotation:+51 y:+200 svgOrigin(992.23,110.77) dur10 @85` (cúpula e facho herdam tudo); fades de conteúdo/heading `@85`. Cortina e beam estáticos. Feature da luminária COMPLETA: entrada, pisca, carrossel e saída aprovados.
 
-**Deploy/servidor:** repo SEM config de deploy (verificado 26/07: sem vercel.json, .vercel/, workflows, netlify). Consulta à conta Vercel do Pedro falhou por rate-limit da integração — pendente decidir onde publicar.
+**Deploy/servidor (RESOLVIDO 26/07):** projeto `kriya` criado na Vercel (team pedroribeiro2706s-projects), conectado ao repo GitHub — **cada push em `main` = deploy automático de produção** (validado). Site estático puro sem build (`vercel.json` força; nunca deixar autodetectar "Vite"). Vercel Authentication DESATIVADA pelo Pedro (site público). URL: https://kriya-pedroribeiro2706s-projects.vercel.app — raiz serve o `index.html` (agora a página CANÔNICA; `portfolio.html` = legado; CLAUDE.md atualizado). Railway: não usado (verificado).
 
 ## Atualização 25/07/2026 — SVG articulado INTEGRADO (Etapas 1 e 2 implementadas). AGUARDANDO AJUSTES FINAIS DO UAT DO PEDRO
 
