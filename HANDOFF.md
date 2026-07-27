@@ -2,7 +2,46 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
-## Atualização 26/07/2026 (noite) — tentativa de ajuste da SAÍDA DA HERO reprovada e REVERTIDA. PRÓXIMA SESSÃO COMEÇA AQUI
+## Atualização 27/07/2026 — SAÍDA DA HERO RESOLVIDA, APROVADA NO UAT E PUBLICADA. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes:** `main` = `2221d91`, publicada na Vercel. Working tree limpo (só `.claude/` untracked, pendência antiga). O que está no ar é exatamente o que o Pedro testou e aprovou ("funcionou muito bem"). Ponto de retorno anterior preservado na tag **`hero-pin-baseline`** (`d61a2f0`) e a branch de trabalho `ajuste-saida-hero` continua no GitHub.
+
+**O problema, com causa raiz medida:** durante a saída dos textos da hero, a página rolava de verdade por baixo da animação. A timeline `hero-exit` era a única do fluxo ancorada em elemento nenhum pinado: ela ia de `.lum-section top bottom` até `top top`, ou seja, era scrubada exatamente na faixa entre o fim do pin do vídeo (776px, numa janela de 776 de altura) e a chegada da luminária (1552px) — 100vh de rolagem real. Medição do deslocamento da `#hero` durante a saída, **antes da correção: −310px**. Esse era o "escorregar" que o Pedro sentia; a animação dos textos em si sempre esteve correta.
+
+**A solução (spec `docs/superpowers/specs/2026-07-27-hero-saida-pin-design.md`, plano `docs/superpowers/plans/2026-07-27-hero-saida-pin.md`):** o ScrollTrigger único que prendia a hero *e* rodava o vídeo — ambos sob `scrub: 3` — virou **três, com uma responsabilidade cada**:
+
+| Trigger | Faixa (janela de 776px) | Papel |
+|---|---|---|
+| `hero-pin` | 0 → 1242 | Só prende a hero. Sem scrub, sem animação. |
+| `hero-video` | 0 → 776 | Só o vídeo: `scrub: 3` e o `onUpdate` intocados (guard `isFinite` preservado). |
+| `hero-exit` | 776 → 1242 | Só a saída dos textos, `scrub: 1` próprio. |
+
+O pin foi estendido de 100vh para 160vh (100 de vídeo + 60 de saída) e a timeline de saída passou a ser ancorada em `#hero`, começando onde o vídeo termina. **Nenhum valor da animação dos textos mudou** — os seis `.to()` são os mesmos. Medição depois: **deslocamento 0px**. A luminária desceu no documento (`lum` agora 2018→6018) e acompanhou sozinha, por estar ancorada na `.lum-section`.
+
+**Por que a tentativa de 26/07 foi reprovada (hipótese que guiou o redesenho):** naquela rota eu estendi o pin **e** troquei a animação de saída por uma reversão fiel da entrada, que herdou o `scrub: 3` do vídeo. Duas variáveis de uma vez, uma delas pesada. Desta vez só o mecanismo de scroll mudou; a animação ficou intacta. Lição para repetir: **quando o usuário diz que a animação está quase certa e o problema é a sensação, mexer só no mecanismo.**
+
+**Decisões técnicas que valem preservar:**
+- As faixas dos três triggers são **posições absolutas de scroll** derivadas de `vh()` e da constante `HERO_TOP = 0` (a hero é a primeira seção). Nenhum trigger lê `.start`/`.end` de outro, então nada depende da ordem de refresh do ScrollTrigger. O plano original previa `refreshPriority`, abandonado porque a referência local do GSAP (`.claude/skills/gsap/references/gsap-scrolltrigger.md`, linha 61) afirma que *menor* refresca primeiro, contrariando o que a documentação online diz — em vez de apostar numa das leituras, a dependência foi eliminada.
+- O pin estendido é **condicional a `≥992px`** (`heroExitAtiva()`), porque a timeline de saída vive dentro do `matchMedia` de 992px. Abaixo disso o pin continua 100vh, como antes.
+- Os triggers da hero são habilitados **juntos** (`heroTriggers.forEach`) no `onComplete` da entrada — se o pin entrasse em vigor antes, criaria seu espaçador com a página ainda travada.
+- Parâmetros de calibração prontos: **`HERO_EXIT_VH = 0.6`** (quanto scroll a saída consome) e o `scrub: 1` da timeline de saída.
+
+**Verificado no navegador (janela 1536×776):** faixas corretas e encostando sem sobrepor; `#hero` em `top: 0` em todos os pontos da saída; os seis alvos chegam a opacidade 0 antes de o pin soltar; scroll reverso restaura tudo; seis idas e voltas rápidas atravessando a emenda vídeo→saída não deixam elemento preso em estado intermediário. UAT do Pedro: aprovado.
+
+**NÃO VERIFICADO:** o comportamento abaixo de 992px. A ferramenta `resize_window` da extensão reporta sucesso mas não altera a viewport (`innerWidth` seguiu 1536 em duas tentativas). Por construção o mobile recebe o mesmo pin de antes, mas isso não foi visto rodando — confirmar na próxima sessão, de preferência pelo DevTools do próprio Pedro.
+
+**BACKLOG, em ordem de prioridade acordada:**
+
+1. **Sobreposição no bloco de texto da direita** (o "pequeno ajuste" que o Pedro confirmou faltar após o UAT). A descrição sobe e invade a área do título DESIGNPLINARY em vez de já estar cortada pela máscara. Hipótese calculada a partir do CSS inline do `index.html`: `.hero-title-02-wrapper` (`bottom: 20vh`, `height: 215px`) e `.hero-description-wrapper` (`top: 74%`) dividem ~54px da mesma faixa vertical numa janela de 900px. **Não verificado visualmente.** Ficou mais aparente depois deste ajuste, porque a tela parada dá tempo de ver.
+2. **Uniformizar a animação da seta de scroll (`.scroll-down-wrapper`)**, item levantado pelo Pedro por preferir código coerente. Hoje ela tem `transition: opacity 1s ease-in-out, transform 1s ease-in-out` no CSS **e** é animada por GSAP na entrada e na saída — os dois sistemas disputam a mesma propriedade, e o CSS interpola por 1s por conta própria. Comprovado ao vivo: no fim do pin o GSAP escrevia `opacity: 0.0009` no elemento enquanto o `computed` seguia em `1`. Correção provável: remover `opacity`/`transform` do `transition` e deixar o GSAP mandar sozinho. **Cuidado:** essa transição também afeta a animação de ENTRADA, que está aprovada — mexer exige novo UAT da entrada, por isso não foi feito de carona.
+3. **Suavidade do scrub do vídeo** — o Pedro considera o movimento atual insatisfatório. Agora isolado no trigger `hero-video`, o que torna o ajuste de baixo risco. Observação a investigar: `scrub` com `ScrollTrigger.create()` **sem animação anexada** pode não ter efeito nenhum sobre o `self.progress` do `onUpdate` — se for o caso, o `scrub: 3` nunca suavizou nada e a suavização precisa ser feita de outro jeito (ex.: interpolar o `currentTime` no ticker). **Não verificado.**
+4. **Responsividade mobile/tablet** — o Pedro olhou no celular e relatou que "está tudo muito desencaixado". Frente própria. Lembrar que no mobile a seção da luminária não existe: o acordeon `#service` assume, por decisão da spec de 19/07.
+
+**Commits desta sessão:** `2d3ba4e` (spec), `c153aa5` (plano), `ed28696` (task 1 — separação dos triggers), `73e9e7c` (task 2 — pin estendido), `2221d91` (merge na main).
+
+**Nota operacional:** durante o merge, o Git falhou uma vez com `unable to append to '.git/logs/HEAD': Permission denied` — bloqueio transitório do arquivo (antivírus ou indexador do Windows). O merge ficou pela metade (mudanças no index, sem commit) e foi concluído com `git commit --no-edit`. Se reaparecer, é isso: não é corrupção do repositório.
+
+## Atualização 26/07/2026 (noite) — tentativa de ajuste da SAÍDA DA HERO reprovada e REVERTIDA (RESOLVIDO em 27/07, ver seção acima)
 
 **Estado dos ambientes (verificado no encerramento):** working tree limpo, HEAD = `origin/main` = `1bf07e9`; localhost:5173 e a produção Vercel servem o MESMO conteúdo (versão aprovada: luminária completa + saída antiga da hero). A tentativa abaixo NUNCA foi commitada — produção intocada.
 
