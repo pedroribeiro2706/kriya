@@ -2,6 +2,18 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
+## Atualização 26/07/2026 (noite) — tentativa de ajuste da SAÍDA DA HERO reprovada e REVERTIDA. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes (verificado no encerramento):** working tree limpo, HEAD = `origin/main` = `1bf07e9`; localhost:5173 e a produção Vercel servem o MESMO conteúdo (versão aprovada: luminária completa + saída antiga da hero). A tentativa abaixo NUNCA foi commitada — produção intocada.
+
+**O pedido do Pedro (hero):** durante o scroll pós-vídeo, a saída dos elementos da hero (NÓS SOMOS / MULTI / DESIGNPLINARY / descrição / switch / seta) transmite sensação de ROLAGEM — o conjunto desliza para cima com a página. Desejo: todos os elementos revertem FIELMENTE a animação de entrada (a heroTimeline pós-switch), com a TELA PARADA — o scroll dirige a animação sem rolar a página — e só depois a página rola para a luminária entrar (aí sim parecendo "a luminária entrando"). Decisões já acordadas: textos revertem fiel ao estado inicial do CSS; switch e seta saem em fade simples; sequencial limpo (vídeo termina preto → começa a saída).
+
+**Tentativa implementada (rota 1) e REVERTIDA:** pin da hero estendido de 100vh para 160vh (`end: "+=160%"`); fase A (0–100vh) = vídeo com o ritmo original (onUpdate com `progress×1.6` clampado em 1); fase B (100–160) = timeline `heroSaida` (reverso fiel, ordem inversa, ease power2.in espelhado; estados-alvo = os `transform` iniciais do CSS: designer y:100%, title-01 y:-100%, title-02 x:-100% [desfazendo antes o y:105px], description y:-100%) anexada como `animation` do trigger (scrub 3, timeline virtual de 160 com a saída em 100–155); o `hero-exit` antigo (trigger .lum-section) removido. Pré-validação por estados no browser passou (conjunto imóvel, preto no fim, unpin→lum ok). **O UAT REAL DO PEDRO REPROVOU — "os ajustes não funcionaram", MOTIVO AINDA NÃO DETALHADO.** Revertido com `git restore index.html`.
+
+**PRÓXIMA SESSÃO — roteiro:** (1) PRIMEIRO: pedir ao Pedro o relato do que ele viu de errado no teste real (é a informação que falta; nada de reimplementar antes disso); (2) diagnosticar a causa com o relato em mãos (candidatos a investigar: sensação do scrub/lag na fase B, a transição vídeo→saída, interações com o clique/entrada, comportamento do pin estendido no scroll real, mobile); (3) redesenhar a solução em conversa e só então implementar. O design da rota 1 acima fica como ponto de partida documentado — pode ser refinado ou descartado conforme o relato.
+
+**Notas de pilotagem (browser) desta rodada:** simular o fluxo de entrada da hero com o ticker travado é hostil (typed text + callbacks do clique). Atalho que funcionou: `gsap.set` manual dos estados pós-entrada + esconder `[class*="typed"/"cursor"/"overlay"]` + `stHero.animation.invalidate()` — os starts do scrub capturam valores errados na pilotagem (elementos ainda pré-entrada); no fluxo real capturam certo porque o trigger só habilita após a entrada completar.
+
 ## Atualização 26/07/2026 — coreografia de saída FINALIZADA e APROVADA ("Perfeito!")
 
 Três rodadas de calibração com UAT do Pedro (sequências `ajuste-facho-*.png` em `references/`):
