@@ -1652,13 +1652,49 @@
                 heroVideo.pause();
                 heroVideo.currentTime = 0;
 
-                // Cria a instância ScrollTrigger para rodar o video com o scroll
-                const heroScrollTrigger = ScrollTrigger.create({
+                // Altura da viewport, lida no momento do cálculo (recalcula no refresh)
+                const vh = () => window.innerHeight;
+
+                // A hero é a PRIMEIRA seção da página, então o pin dela começa no
+                // scroll 0. As faixas abaixo são posições absolutas de scroll (px),
+                // derivadas só de vh() — assim nenhum trigger depende de outro nem da
+                // ordem em que o ScrollTrigger recalcula as posições.
+                // (Se um dia entrar conteúdo acima da hero, este 0 precisa virar a
+                // posição de scroll em que a hero encosta no topo.)
+                const HERO_TOP = 0;
+
+                // Quanto scroll a saída dos textos consome, em alturas de viewport.
+                // Calibrável: aumentar deixa a saída mais lenta em relação ao scroll.
+                const HERO_EXIT_VH = 0.6;
+
+                // A saída dos textos só existe no desktop (a timeline vive dentro do
+                // matchMedia de 992px). Abaixo disso o pin continua com uma viewport,
+                // exatamente como antes.
+                const heroExitAtiva = () => window.matchMedia("(min-width: 992px)").matches;
+
+                // --- Trigger 1: SÓ prende a hero na tela ---
+                // Sem scrub e sem animação: a única função é imobilizar a seção.
+                // Vai até o FIM da saída dos textos — é isso que mantém a tela parada
+                // enquanto o scroll dirige a animação de saída.
+                // A animação de saída age nos FILHOS, nunca no elemento pinado.
+                const heroPinST = ScrollTrigger.create({
                     trigger: "#hero",
                     start: "top top",
-                    end: "bottom top",
-                    scrub: 3,
+                    end: () => "+=" + (vh() * (heroExitAtiva() ? 1 + HERO_EXIT_VH : 1)),
                     pin: true, // 🔥 Mantém a seção fixa enquanto o vídeo é controlado pelo scroll
+                    invalidateOnRefresh: true,
+                    id: "hero-pin"
+                });
+
+                // --- Trigger 2: SÓ o vídeo ---
+                // Mesma faixa de scroll de antes (uma viewport) e mesmo scrub.
+                const heroVideoST = ScrollTrigger.create({
+                    trigger: "#hero",
+                    start: () => HERO_TOP,
+                    end: () => HERO_TOP + vh(),
+                    scrub: 3,
+                    invalidateOnRefresh: true,
+                    id: "hero-video",
                     onUpdate: (self) => {
                         let progress = self.progress; // varia de 0 a 1
                         // Atualiza o currentTime do vídeo conforme o progresso
@@ -1677,14 +1713,19 @@
                     }
                 });
 
-                // Desative o gatilho de rolagem até que a timeline da animação inicial da Hero section termine.
-                heroScrollTrigger.disable();
+                // Os triggers da hero são habilitados JUNTOS, só depois da entrada:
+                // se o pin entrasse em vigor antes, criaria seu espaçador de layout
+                // enquanto a página ainda está travada.
+                const heroTriggers = [heroPinST, heroVideoST];
 
-                // Adiciona um onComplete callback a timeline da animação inicial da Hero Section 
+                // Desative os gatilhos até que a timeline da animação inicial da Hero section termine.
+                heroTriggers.forEach(st => st.disable());
+
+                // Adiciona um onComplete callback a timeline da animação inicial da Hero Section
                 // para habilitar o scroll da página.
 
                 heroTimeline.eventCallback("onComplete", () => {
-                    heroScrollTrigger.enable();
+                    heroTriggers.forEach(st => st.enable());
                     document.body.style.overflow = ''; // or 'auto'
                     ScrollTrigger.refresh();
                 });
@@ -1695,15 +1736,20 @@
 
                 mm.add("(min-width: 992px)", () => {
 
-                    // --- Saída animada dos títulos da hero (enquanto a seção da luminária sobe) ---
-                    // Direções conforme main-bkp-03.js: "PEDRO RIBEIRO" desce, "MULTI" sobe,
+                    // --- Saída animada dos títulos da hero (COM A TELA PINADA) ---
+                    // Direções conforme main-bkp-03.js: "NÓS SOMOS" desce, "MULTI" sobe,
                     // "DESIGNPLINARY" desce, descrição sobe, switch e seta somem em fade.
+                    // A faixa começa onde o vídeo termina (uma viewport) e vai até o fim
+                    // do pin — por isso a tela fica imóvel durante toda a animação, em vez
+                    // de a página rolar por baixo como acontecia quando esta timeline era
+                    // ancorada na subida da .lum-section.
                     gsap.timeline({
                         scrollTrigger: {
-                            trigger: ".lum-section",
-                            start: "top bottom",
-                            end: "top top",
+                            trigger: "#hero",
+                            start: () => HERO_TOP + vh(),
+                            end: () => HERO_TOP + vh() * (1 + HERO_EXIT_VH),
                             scrub: 1,
+                            invalidateOnRefresh: true,
                             id: "hero-exit"
                         },
                         defaults: { ease: "none" }
