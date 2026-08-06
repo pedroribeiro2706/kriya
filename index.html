@@ -253,10 +253,10 @@
       /* Contêiner para "DESIGNPLINARY" */
       .hero-title-02-wrapper {
         position: absolute;
-        bottom: 20vh; /* Alinhado com "MULTI" */
+        bottom: 26vh; /* Borda inferior da máscara na linha dos 74% (= top da máscara da descrição); topo inalterado */
         left: 33%; /* Ajustado para começar a partir do "I" de "MULTI" */
         width: 950px; /* Ajustado para a largura certa */
-        height: 215px; /* Aumentado para não cortar a palavra ao descer */
+        height: calc(215px - 6vh); /* Compensa o bottom para o topo não se mover (100vh - 26vh - height = 80vh - 215px) */
         overflow: hidden; /* Cria a máscara */
         z-index: 2;
         display: flex;
@@ -306,8 +306,7 @@
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
-        opacity: 0; /* Começa invisível */
-        transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+        opacity: 0; /* Começa invisível; opacity/transform são do GSAP (entrada e saída) — sem transition CSS disputando */
         z-index: 4;
       }
       
