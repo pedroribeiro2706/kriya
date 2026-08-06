@@ -2,7 +2,45 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
-## Atualização 27/07/2026 — SAÍDA DA HERO RESOLVIDA, APROVADA NO UAT E PUBLICADA. PRÓXIMA SESSÃO COMEÇA AQUI
+## Atualização 06/08/2026 — ITENS 1 E 2 DO BACKLOG RESOLVIDOS, APROVADOS NO UAT E PUBLICADOS. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes:** `main` = `fc469e0` (merge com UAT aprovado), publicada na Vercel — **verificado por fetch da produção**: CSS novo presente (`calc(215px - 6vh)`, `bottom: 26vh`), transition antiga ausente. Working tree limpo (só `.claude/` untracked, pendência antiga). Branch de trabalho `ajuste-overlap-texto-hero` preservada no GitHub. Commits de conteúdo: `7130b53` (máscara do título) e `c0fb4db` (seta de scroll); specs e planos em `docs/superpowers/`.
+
+**UAT do Pedro (06/08): "Ficou ótimo!"** — cobriu entrada completa, saída dos textos, reversões e o novo fade da seta.
+
+### Item 1 — Overlap dos textos da direita (RESOLVIDO)
+
+- **Causa raiz medida (não era só "a máscara não corta"):** cruzamento MÚTUO. Na saída o título desce (`y: "+=220"`) e a descrição sobe (`y: -180`), atravessando em sentidos opostos uma faixa compartilhada de ~45px entre as máscaras — a do título terminava 59px abaixo do glifo (sobra da entrada, que desce o texto 105px), a da descrição começava 14px acima da zona do título. Fade linear junto com o movimento: no pico do cruzamento ambos com ~80% de opacidade.
+- **Correção (CSS-only, 2 declarações):** `.hero-title-02-wrapper`: `bottom: 20vh → 26vh` e `height: 215px → calc(215px - 6vh)`. O topo do wrapper é invariante (`80vh − 215px` antes e depois) ⇒ layout parado intacto; a borda inferior da máscara passa a coincidir com o `top: 74%` da máscara da descrição ⇒ **faixa compartilhada zero em qualquer altura de janela**. JS intocado; os seis `.to()` da saída preservados (mesma lição de 27/07: mexer só no mecanismo).
+- **Verificado:** 3 alturas de janela (742/776/719px), 3 pontos da saída (10/20/30% — faixas visíveis disjuntas em todos), screenshots antes/depois no ponto do bug (20%), glifo íntegro em repouso. A entrada é segura por geometria: o repouso é o ponto mais baixo da descida do título, então "íntegro em repouso" ⇒ íntegro na descida toda.
+- Spec: `docs/superpowers/specs/2026-08-06-hero-overlap-texto-direita-design.md` · Plano: `docs/superpowers/plans/2026-08-06-hero-overlap-texto-direita.md`
+
+### Item 2 — Seta de scroll unificada no GSAP (RESOLVIDO)
+
+- **Sintoma re-comprovado antes do fix:** a 90% da saída, o GSAP escrevia `opacity: 0.1004` no elemento e o computed seguia `1` — a `transition: opacity 1s, transform 1s` do CSS interpolando por conta própria sobre cada escrita do GSAP.
+- **Correção:** removida a linha `transition` do `.scroll-down-wrapper` (só listava as duas propriedades em disputa). O `@keyframes bounce` do `.scroll-arrow` ficou intacto (elemento filho, sem conflito). Nenhum toggle de classe dependia da transition (verificado por grep).
+- **Depois:** computed == GSAP em 90% (`0.1004`) e em 100% (`0` + `visibility: hidden` do autoAlpha). O fade de ENTRADA da seta agora é só o tween GSAP (1s, power2.out) — percepção levemente mais direta, **aprovada no UAT**.
+- Spec: `docs/superpowers/specs/2026-08-06-seta-scroll-transition-design.md` · Plano: `docs/superpowers/plans/2026-08-06-seta-scroll-transition.md`
+
+### Conhecimento operacional NOVO de pilotagem (browser automatizado, aba throttled)
+
+- **Corrupção por refresh no meio da faixa:** `ScrollTrigger.refresh()` disparado por eventos assíncronos (onComplete da entrada, load) com a página parada DENTRO da faixa de um trigger e o ticker congelado recaptura os starts dos tweens com os elementos já deslocados (`invalidateOnRefresh`) — e cada tween pode recapturar um número diferente de vezes, produzindo estados mistos (frações de progresso diferentes por elemento). **Protocolo correto:** `scrollTo(0,0)` → `heroTl.progress(1)` → `tick` → `ScrollTrigger.refresh(true)` → 2 ticks → só então scrollar para a faixa. Não afeta usuários reais.
+- **Localizar a `heroTimeline`** (const em closure, sem acesso global): `gsap.globalTimeline.getChildren(true, false, true).find(tl => tl.paused() && !tl.scrollTrigger && tl.getChildren(true, true, false).some(tw => tw.targets().includes(document.querySelector(".hero-designer"))))`. Depois `progress(1)` dispara o onComplete e habilita os triggers com os elementos no estado certo.
+- **Screenshots CDP** na aba throttled dão timeout de 30s às vezes; `gsap.ticker.tick()` + repetir a captura resolve.
+- **Resize da janela <992px durante a pilotagem** desmonta `hero-exit`/`lum` na hora (matchMedia) — checar `innerWidth` antes de cada medição. **Bônus:** isso verificou ao vivo o teardown do matchMedia, que 27/07 listava como não verificado (parcial: teardown por resize funciona; a CARGA em viewport mobile real segue não vista).
+
+### BACKLOG (ordem acordada, atualizada)
+
+1. **Suavidade do scrub do vídeo** (era o item 3) — PRÓXIMA FRENTE. Investigar primeiro a suspeita registrada em 27/07: `scrub` em `ScrollTrigger.create()` **sem animação anexada** pode não suavizar nada — o `self.progress` do `onUpdate` seguiria o scroll cru, e o `scrub: 3` do trigger `hero-video` nunca teria feito efeito. **Não verificado.** Se confirmado, a suavização precisa ser feita de outro jeito (ex.: interpolar o `currentTime` no ticker). O trigger está isolado (`hero-video`, faixa 0→1vh), então o ajuste é de baixo risco.
+2. **Responsividade mobile/tablet** (era o item 4) — "está tudo muito desencaixado" no celular. Lembrar: no mobile a seção da luminária não existe; o acordeon `#service` assume (decisão da spec de 19/07). Somar a esta frente: a colisão dos textos da direita EM REPOUSO em janelas internas ≥ ~917px de altura (pré-existente, documentada no spec do item 1 de hoje) e o UAT em alturas 900/1080px via DevTools que ficou de fora do ciclo de hoje.
+
+### Roteiro sugerido para a próxima sessão (07/08)
+
+1. Abrir com o item 1 do backlog (scrub do vídeo). Fase de investigação antes de qualquer mudança: (a) conferir na referência local do GSAP (`.claude/skills/gsap/references/gsap-scrolltrigger.md`) e/ou na doc oficial se `scrub` sem `animation` suaviza o `self.progress`; (b) medir ao vivo: comparar `self.progress` com o scroll cru durante movimento (a pilotagem com ticker manual NÃO serve para medir suavização temporal — vai precisar de aba em foco real ou de logging com a página rodando livre; considerar `read_console_messages` com a aba aberta pelo Pedro).
+2. Brainstorm curto com o Pedro sobre a SENSAÇÃO desejada do vídeo (mais peso? mais resposta?) antes de implementar qualquer suavização.
+3. Se sobrar fôlego: iniciar a auditoria mobile (item 2).
+
+## Atualização 27/07/2026 — SAÍDA DA HERO RESOLVIDA, APROVADA NO UAT E PUBLICADA (itens 1 e 2 do backlog desta seção resolvidos em 06/08, ver acima)
 
 **Estado dos ambientes:** `main` = `2221d91`, publicada na Vercel. Working tree limpo (só `.claude/` untracked, pendência antiga). O que está no ar é exatamente o que o Pedro testou e aprovou ("funcionou muito bem"). Ponto de retorno anterior preservado na tag **`hero-pin-baseline`** (`d61a2f0`) e a branch de trabalho `ajuste-saida-hero` continua no GitHub.
 
