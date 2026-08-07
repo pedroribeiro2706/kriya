@@ -17,3 +17,7 @@ __MACOSX/
 
 # Build do Vite
 dist/
+
+# Variantes de encode em avaliação (bancada teste-scrub.html). São tentativas
+# locais, ~12 MB. A variante ESCOLHIDA vai para assets/ e é versionada.
+assets/scrub-testes/
