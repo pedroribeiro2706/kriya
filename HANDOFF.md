@@ -2,7 +2,79 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
-## Atualização 06/08/2026 — ITENS 1 E 2 DO BACKLOG RESOLVIDOS, APROVADOS NO UAT E PUBLICADOS. PRÓXIMA SESSÃO COMEÇA AQUI
+## Atualização 07/08/2026 — SCRUB DO VÍDEO RESOLVIDO, APROVADO NO UAT E PUBLICADO. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes:** `main` = `7ca2dfd` (merge), publicada na Vercel — **verificado por fetch da produção**: serve `assets/hero-scrub.mp4` (3,98 MB), `HERO_VIDEO_VH = 2.0`, `LERP = 0.08`, `VIDEO_FPS = 12`, guarda `readyState >= 2` presente. Working tree limpo (`.claude/` untracked, pendência antiga). Branch `ajuste-scrub-video-hero` preservada. Spec: `docs/superpowers/specs/2026-08-07-video-scrub-hero-design.md` · Plano: `docs/superpowers/plans/2026-08-07-video-scrub-hero.md`.
+
+**UAT do Pedro (07/08):** "melhorou muito" na bancada; **"está ótimo"** no site com os valores finais.
+
+### O item 1 do backlog era TRÊS problemas somados, não um
+
+**Causa 1 — `scrub: 3` era inerte. VERIFICADO NO FONTE, não é hipótese.**
+Baixei o ScrollTrigger 3.12.7 não-minificado e li o caminho de código:
+- linhas 1714–1722: `self.scrubDuration(scrub)` está **dentro do bloco `if (animation)`** — e é a única chamada que cria o `scrubTween` (a tween de catch-up, `ease: "expo"`).
+- linha 2284: `self.progress = clipped`, derivado direto do scroll. linha 2343: `onUpdate(self)`.
+
+O `hero-video` é um `ScrollTrigger.create()` **sem `animation` anexada** ⇒ `scrubTween` nunca existiu ⇒ o `onUpdate` sempre recebeu progresso cru. **A suspeita de 27/07 está confirmada, e vale retroativamente para as 11 variantes desde março/2025** (`scrub: 9` no `test-video.html` e `js/main.js`, `scrub: 3` no `portfolio.html`, `test-video-02.js`, `test-video-03.js`, `testing.js`). As variantes por `wheel` (`main-bkp-01/02/03.js`) também nunca suavizaram: `currentTime += deltaY * 0.005`, atribuição direta.
+
+**Causa 2 — o arquivo era hostil a seek.** Medido por um parser de átomos MP4 escrito na sessão (`ffprobe` não existe nesta máquina): `coffee-03.mp4` = 19,98 MB, 1920×1080, 21 s, 630 frames @30fps, **21 keyframes = GOP 30**. Cada seek obrigava a decodificar até 29 frames intermediários a 1080p.
+
+**Causa 3 — a razão pixels-por-frame era impossível.** 630 frames em 1 viewport (776px) = **1,23 px por frame**; um giro de roda (~100px) pulava ~81 frames e o vídeo inteiro cabia em 8 giros. É literalmente o sintoma que o Pedro relatou ("pula do primeiro frame direto pro último"). A faixa saudável é 5–15 px/frame.
+
+> **Insight que vale guardar:** no scrub, o **fps do arquivo é irrelevante para a fluidez** — quem dita o ritmo é o scroll, não o relógio. O que importa é frames ÷ pixels. Por isso baixar de 30fps para 12fps **melhorou** em vez de piorar.
+
+### A correção
+
+**JS** — o trigger virou só um leitor (`onUpdate` grava o alvo e sai) e um callback no `gsap.ticker` faz a interpolação, com três guardas: `isFinite(duration)` (preservada), `readyState >= 2` (nova) e **throttle de um frame por seek** (nova — sem ela o ticker manda 60 seeks/s). Lerp independente de framerate via `Math.pow(1 - LERP, gsap.ticker.deltaRatio())`.
+
+**Arquivo** — `assets/hero-scrub.mp4`: 1280×720, 12fps, 254 frames, **GOP 1**, 3,98 MB. Nome por função, não por conteúdo: na fase do vídeo autoral o arquivo novo entra com o mesmo nome e o código não muda.
+
+**Geometria** — `HERO_VIDEO_VH = 2.0` (nova constante). Faixas na janela de 776px: `hero-video` 0→1552, `hero-exit` 1552→2018, `hero-pin` 0→2018. **Os seis `.to()` da saída dos textos não mudaram** — só a janela em que rodam. A `lum` acompanhou sozinha (2018→2794), por estar ancorada na `.lum-section`. Terceira vez que a lição de 27/07 se aplica: mexer só no mecanismo.
+
+**Calibração escolhida no UAT:** `LERP = 0.08` (mais peso que os 0.12 iniciais) e faixa 2,0vh ("a animação fica mais fluida e completa, apesar de ficar um pouco mais lenta"). A hero agora consome 2,6 viewports de pin.
+
+### Bancada de medição (`teste-scrub.html`) — e a skill que saiu dela
+
+A comparação entre variantes não foi por impressão: a bancada conta os frames **realmente apresentados** via `requestVideoFrameCallback` e desenha cada frame como coluna que acende quando pintado. O botão de passada de 2s dá a cobertura, que é o número comparável.
+
+Achado do UAT: **o Pedro não distinguiu A, B, C e D.** Isso é informação, não empate — significa que qualquer GOP curto resolve, e a escolha virou critério objetivo. Ficou a **A** (GOP 1 protege o caso ruim — mobile e máquinas fracas — por só 2 MB a mais que a B; e tem 254 frames contra 149 da C, o que rende movimento mais fiel em rolagem lenta).
+
+| variante | MB | resolução | fps | frames | GOP | px/frame (faixa 1552) |
+|---|---:|---|---:|---:|---:|---:|
+| `coffee-03` (antigo) | 19,98 | 1920×1080 | 30 | 630 | 30 | 2,46 |
+| **A → `hero-scrub.mp4`** | 3,98 | 1280×720 | 12 | 254 | **1** | 6,11 |
+| B | 1,90 | 1280×720 | 12 | 254 | 5 | 6,11 |
+| C | 2,90 | 1280×720 | 7 | 149 | 1 | 10,42 |
+| D | 3,97 | 1920×1080 | 12 | 254 | 5 | 6,11 |
+
+O pipeline virou **skill global** a pedido do Pedro: `C:\Users\Pedro\.claude\skills\video-scrub-bench\` (SKILL.md, `mp4probe.js`, `references/encode.md`, `references/implementacao.md`, `assets/bancada.template.html`). Espelhada em `Brain\docs\assets\skills\video-scrub-bench\` e registrada no `setup-guide.md` como passo `3d`, conforme o protocolo do harness global. **A cópia no Brain não foi commitada** — havia renomeações de outra sessão em staging lá (`docs/AIOS-Structure/` → `historico/`) e misturar seria bagunça.
+
+### Ferramental descoberto (economiza tempo na próxima)
+
+- **`ffmpeg` existe nesta máquina**, apesar de não estar no PATH: `G:\Anthropic Playground\Remotion Skills\node_modules\@remotion\compositor-win32-x64-msvc\ffmpeg.exe` (n7.1, com `libx264` e `libvpx-vp9`). **Ressalva:** build com `--disable-filters` e allowlist — **o filtro `fps` NÃO existe** (só `scale`); usar `-r 12`, nunca `-vf fps=12`. Verificado.
+- **`mp4probe.js`** lê GOP, frames, resolução e faststart sem ffprobe. Atenção a uma sutileza: **átomo `stss` ausente significa que TODOS os frames são keyframes** (GOP 1), não que não há nenhum.
+- **Limitação de pilotagem confirmada de novo:** o Chrome **não carrega vídeo em aba com `visibilityState: "hidden"`** (`buffered` vazio, `readyState` 0, `networkState` 2 eternamente). Geometria e layout dá para verificar sozinho; **suavidade de vídeo exige aba em foco real do Pedro.** As opacidades da saída travando em 0.8 sob ticker manual são o mesmo artefato já visto em 06/08, não regressão.
+
+### PENDÊNCIAS EXPLÍCITAS (não fechadas nesta sessão)
+
+1. **Firefox / `webm` — NÃO MEDIDO.** O Firefox é comprovadamente ruim com mp4 nesse cenário mesmo com GOP baixo, e o iOS Safari prefere mp4. O plano previa avaliar um `<source>` webm, e isso **não foi feito** — o UAT foi só no Chrome. A ordem dos `<source>` tem que ser decidida medindo, não deduzindo (o browser usa o primeiro formato que suporta; se o Safari suportar webm mas render pior nele, pôr webm primeiro piora). Comando de encode pronto em `references/encode.md` da skill.
+2. **`coffee-03.mp4` (20 MB) — decisão revertida para o Pedro.** Eu afirmei que estava "sem uso" e **estava errado**: ele é referenciado por `portfolio.html:446`, `test-video-02.html`, `test-video-02-bkp-02.html`, `v-test-video-02-js-bkp.html`, `v-test-video-03.html`, `back-ups/test-video-03.html` e pela própria `teste-scrub.html` (que o usa como termo de comparação). O CLAUDE.md manda NÃO APAGAR esses protótipos. O Pedro autorizou a remoção com base na minha premissa errada, então **não removi** — a decisão precisa ser retomada com o fato correto.
+3. **`assets/scrub-testes/`** (variantes B, C, D, ~9 MB) está no `.gitignore`, fora do git. Só existe nesta máquina; a bancada quebra parcialmente num clone novo.
+
+### BACKLOG (ordem atualizada)
+
+1. **Vídeo autoral no Higgsfield** (Fase 4 do plano de 07/08). O spec de encomenda já tem números provados: **~250 frames**, master em pelo menos 1920×1080 (para poder reduzir), **movimento contínuo e lento — sem cortes secos**, porque o scrub expõe corte como salto; sem áudio. Depois passa pelo mesmo pipeline (`-r 12`, GOP 1, 720p, `-movflags +faststart`) e pela bancada. **Não verificado ainda:** que durações, resoluções e formatos o Higgsfield entrega — é o primeiro passo dessa frente, não uma suposição. Antes de gerar, brainstorm com o Pedro sobre o CONCEITO visual (o café é o ponto de partida a superar, não a referência a copiar).
+2. **Responsividade mobile/tablet** — "está tudo muito desencaixado". Frente própria. Herda desta sessão: o Android é comprovadamente ruim em scrub com scroll nativo mesmo com GOP baixo, e o plano B (sequência de imagens em canvas) está documentado na skill mas **não construído** — só construir depois de medir. Somar: a colisão dos textos da direita EM REPOUSO em janelas ≥ ~917px de altura (pré-existente, no spec de 06/08) e o UAT em alturas 900/1080px que segue de fora.
+3. **Firefox/webm** (pendência 1 acima) — pode entrar junto da frente mobile, já que ambas são "cobertura de plataforma".
+
+### Roteiro sugerido para a próxima sessão
+
+1. Retomar a decisão sobre o `coffee-03.mp4` com o fato correto (pendência 2).
+2. Brainstorm do conceito do vídeo autoral **antes** de tocar no Higgsfield.
+3. Verificar o que o Higgsfield entrega (duração/resolução/formato) e só então gerar.
+4. Encodar pelo pipeline da skill, medir na bancada, UAT.
+
+## Atualização 06/08/2026 — ITENS 1 E 2 DO BACKLOG RESOLVIDOS, APROVADOS NO UAT E PUBLICADOS
 
 **Estado dos ambientes:** `main` = `fc469e0` (merge com UAT aprovado), publicada na Vercel — **verificado por fetch da produção**: CSS novo presente (`calc(215px - 6vh)`, `bottom: 26vh`), transition antiga ausente. Working tree limpo (só `.claude/` untracked, pendência antiga). Branch de trabalho `ajuste-overlap-texto-hero` preservada no GitHub. Commits de conteúdo: `7130b53` (máscara do título) e `c0fb4db` (seta de scroll); specs e planos em `docs/superpowers/`.
 
