@@ -443,7 +443,7 @@
                         </svg>
                     </div>
     
-            <video class="hero-video" src="assets/coffee-03.mp4" playsinline></video>
+            <video class="hero-video" src="assets/coffee-03.mp4" playsinline muted preload="auto"></video>
             <!--video id="theVideo" tabindex="0" autobuffer preload>
                 <source src="assets/teste.mp4" type="video/mp4">
             </video-->
@@ -1662,6 +1662,13 @@
                 // posição de scroll em que a hero encosta no topo.)
                 const HERO_TOP = 0;
 
+                // Quanto scroll o VÍDEO consome, em alturas de viewport.
+                // Calibrável: aumentar dá mais pixels de scroll por frame do vídeo,
+                // que é o que torna o movimento legível. Com 1vh (valor anterior) e
+                // um vídeo de 630 frames sobravam 1,23px por frame numa janela de
+                // 776px — um único giro da roda pulava ~81 frames.
+                const HERO_VIDEO_VH = 1.5;
+
                 // Quanto scroll a saída dos textos consome, em alturas de viewport.
                 // Calibrável: aumentar deixa a saída mais lenta em relação ao scroll.
                 const HERO_EXIT_VH = 0.6;
@@ -1679,36 +1686,68 @@
                 const heroPinST = ScrollTrigger.create({
                     trigger: "#hero",
                     start: "top top",
-                    end: () => "+=" + (vh() * (heroExitAtiva() ? 1 + HERO_EXIT_VH : 1)),
+                    end: () => "+=" + (vh() * (HERO_VIDEO_VH + (heroExitAtiva() ? HERO_EXIT_VH : 0))),
                     pin: true, // 🔥 Mantém a seção fixa enquanto o vídeo é controlado pelo scroll
                     invalidateOnRefresh: true,
                     id: "hero-pin"
                 });
 
                 // --- Trigger 2: SÓ o vídeo ---
-                // Mesma faixa de scroll de antes (uma viewport) e mesmo scrub.
+                // O trigger é apenas um LEITOR de posição de scroll: grava o alvo e sai.
+                // Quem escreve no vídeo é o ticker logo abaixo, com interpolação própria.
+                //
+                // `scrub` foi REMOVIDO de propósito. Num ScrollTrigger.create() SEM
+                // `animation` anexada o GSAP nunca cria o scrubTween — no fonte do
+                // ScrollTrigger 3.12.7 a chamada `self.scrubDuration(scrub)` está dentro
+                // do bloco `if (animation)` (linhas 1714-1722), e é ela a única que cria
+                // a tween de catch-up. Sem animation, o `self.progress` entregue ao
+                // onUpdate é o progresso CRU do scroll (linha 2284: `self.progress =
+                // clipped`). Ou seja: o `scrub: 3` que estava aqui nunca suavizou nada,
+                // desde a primeira versão de março/2025.
+                let alvoProgresso = 0;
+                let suaveProgresso = 0;
+                let ultimoTempoEscrito = -1;
+
                 const heroVideoST = ScrollTrigger.create({
                     trigger: "#hero",
                     start: () => HERO_TOP,
-                    end: () => HERO_TOP + vh(),
-                    scrub: 3,
+                    end: () => HERO_TOP + vh() * HERO_VIDEO_VH,
                     invalidateOnRefresh: true,
                     id: "hero-video",
-                    onUpdate: (self) => {
-                        let progress = self.progress; // varia de 0 a 1
-                        // Atualiza o currentTime do vídeo conforme o progresso
-                        // Guard: o evento 'load' da window não espera o <video> carregar
-                        // metadata, então duration pode chegar NaN na primeira atualização.
-                        if (isFinite(heroVideo.duration)) {
-                            let newTime = heroVideo.duration * progress;
-                            heroVideo.currentTime = newTime;
-                        }
-                        // console.log("🎥 currentTime atualizado:", newTime.toFixed(2));
+                    onUpdate: (self) => { alvoProgresso = self.progress; }
+                });
 
-                        // 🔥 Quando o vídeo atingir 95% do progresso, libera a rolagem
-                        if (progress >= 0.95) {
-                            console.log("✅ Scroll liberado!");
-                        }
+                // Interpolação do playhead do vídeo.
+                // LERP menor = mais inércia (o vídeo demora mais para alcançar o scroll).
+                // 0.12 ≈ 0,15s de atraso perceptível a 60fps — a "inércia leve" acordada.
+                const LERP = 0.12;
+
+                // fps do arquivo de vídeo em uso. Serve de passo mínimo entre seeks:
+                // não adianta pedir ao decoder um seek que cairia no mesmo frame que já
+                // está na tela — é só trabalho jogado fora.
+                // ATENÇÃO: precisa casar com o fps do arquivo. coffee-03.mp4 = 30fps.
+                const VIDEO_FPS = 30;
+                const PASSO_FRAME = 1 / VIDEO_FPS;
+
+                gsap.ticker.add(() => {
+                    // Guard: o evento 'load' da window não espera o <video> carregar
+                    // metadata, então duration pode chegar NaN nos primeiros ticks.
+                    if (!isFinite(heroVideo.duration)) return;
+
+                    const d = alvoProgresso - suaveProgresso;
+                    if (Math.abs(d) < 0.0005) {
+                        suaveProgresso = alvoProgresso; // encostou: para de perseguir
+                    } else {
+                        // lerp independente de framerate (deltaRatio vale 1 a 60fps)
+                        suaveProgresso += d * (1 - Math.pow(1 - LERP, gsap.ticker.deltaRatio()));
+                    }
+
+                    const t = suaveProgresso * heroVideo.duration;
+                    // readyState >= 2 (HAVE_CURRENT_DATA): não pedir seek antes de haver
+                    // dado decodificado. PASSO_FRAME: throttle, um seek por frame no máximo.
+                    if (heroVideo.readyState >= 2 && Math.abs(t - ultimoTempoEscrito) >= PASSO_FRAME) {
+                        ultimoTempoEscrito = t;
+                        heroVideo.currentTime = t;
                     }
                 });
 
@@ -1738,15 +1777,15 @@
                     // --- Saída animada dos títulos da hero (COM A TELA PINADA) ---
                     // Direções conforme main-bkp-03.js: "NÓS SOMOS" desce, "MULTI" sobe,
                     // "DESIGNPLINARY" desce, descrição sobe, switch e seta somem em fade.
-                    // A faixa começa onde o vídeo termina (uma viewport) e vai até o fim
+                    // A faixa começa onde o vídeo termina (HERO_VIDEO_VH) e vai até o fim
                     // do pin — por isso a tela fica imóvel durante toda a animação, em vez
                     // de a página rolar por baixo como acontecia quando esta timeline era
                     // ancorada na subida da .lum-section.
                     gsap.timeline({
                         scrollTrigger: {
                             trigger: "#hero",
-                            start: () => HERO_TOP + vh(),
-                            end: () => HERO_TOP + vh() * (1 + HERO_EXIT_VH),
+                            start: () => HERO_TOP + vh() * HERO_VIDEO_VH,
+                            end: () => HERO_TOP + vh() * (HERO_VIDEO_VH + HERO_EXIT_VH),
                             scrub: 1,
                             invalidateOnRefresh: true,
                             id: "hero-exit"
