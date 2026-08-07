@@ -443,7 +443,7 @@
                         </svg>
                     </div>
     
-            <video class="hero-video" src="assets/coffee-03.mp4" playsinline muted preload="auto"></video>
+            <video class="hero-video" src="assets/hero-scrub.mp4" playsinline muted preload="auto"></video>
             <!--video id="theVideo" tabindex="0" autobuffer preload>
                 <source src="assets/teste.mp4" type="video/mp4">
             </video-->
@@ -1667,7 +1667,10 @@
                 // que é o que torna o movimento legível. Com 1vh (valor anterior) e
                 // um vídeo de 630 frames sobravam 1,23px por frame numa janela de
                 // 776px — um único giro da roda pulava ~81 frames.
-                const HERO_VIDEO_VH = 1.5;
+                // 2.0 escolhido no UAT de 07/08: "a animação fica mais fluida e
+                // completa, apesar de ficar um pouco mais lenta". Com os 254 frames
+                // do hero-scrub.mp4 dá 6,11px por frame numa janela de 776px.
+                const HERO_VIDEO_VH = 2.0;
 
                 // Quanto scroll a saída dos textos consome, em alturas de viewport.
                 // Calibrável: aumentar deixa a saída mais lenta em relação ao scroll.
@@ -1719,14 +1722,15 @@
 
                 // Interpolação do playhead do vídeo.
                 // LERP menor = mais inércia (o vídeo demora mais para alcançar o scroll).
-                // 0.12 ≈ 0,15s de atraso perceptível a 60fps — a "inércia leve" acordada.
-                const LERP = 0.12;
+                // 0.08 escolhido no UAT de 07/08 — um pouco mais de peso que os 0.12
+                // iniciais. Dá ~0,24s de atraso perceptível a 60fps.
+                const LERP = 0.08;
 
                 // fps do arquivo de vídeo em uso. Serve de passo mínimo entre seeks:
                 // não adianta pedir ao decoder um seek que cairia no mesmo frame que já
                 // está na tela — é só trabalho jogado fora.
-                // ATENÇÃO: precisa casar com o fps do arquivo. coffee-03.mp4 = 30fps.
-                const VIDEO_FPS = 30;
+                // ATENÇÃO: precisa casar com o fps do arquivo. hero-scrub.mp4 = 12fps.
+                const VIDEO_FPS = 12;
                 const PASSO_FRAME = 1 / VIDEO_FPS;
 
                 gsap.ticker.add(() => {
