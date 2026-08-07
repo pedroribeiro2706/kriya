@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bancada — scrub do vídeo da hero</title>
+    <style>
+        :root {
+            --fundo: #0a0a0b;
+            --superficie: #141416;
+            --linha: #2a2a2e;
+            --texto: #e8e8ea;
+            --apagado: #8a8a92;
+            --marcador: #ff5c1f;
+            /* playhead, frames pintados */
+            --suave: #4ec9ff;
+            /* progresso interpolado */
+
+            --mono: ui-monospace, "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+            --sans: "Inter Tight", "Roboto Condensed", system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            background: var(--fundo);
+            color: var(--texto);
+            font-family: var(--sans);
+        }
+
+        /* ---------- palco: replica a geometria da hero ---------- */
+        #palco {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 0;
+        }
+
+        #palco video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* altura de rolagem = faixa do vídeo + uma tela de folga */
+        #trilho {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #aviso-fim {
+            position: absolute;
+            bottom: 40vh;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--apagado);
+        }
+
+        /* ---------- HUD ---------- */
+        #hud {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            background: color-mix(in srgb, var(--superficie) 92%, transparent);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--linha);
+            padding: 14px 18px 16px;
+            display: grid;
+            gap: 12px;
+        }
+
+        /* régua de frames — o instrumento central */
+        #regua {
+            display: block;
+            width: 100%;
+            height: 54px;
+            background: #08080a;
+            border: 1px solid var(--linha);
+        }
+
+        .legenda-regua {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--apagado);
+            letter-spacing: .06em;
+            margin-top: -6px;
+        }
+
+        /* controles */
+        .controles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .grupo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rotulo {
+            font-size: 10px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--apagado);
+            white-space: nowrap;
+        }
+
+        button {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--texto);
+            background: transparent;
+            border: 1px solid var(--linha);
+            padding: 6px 11px;
+            cursor: pointer;
+            transition: border-color .12s, color .12s;
+        }
+
+        button:hover {
+            border-color: var(--apagado);
+        }
+
+        button[aria-pressed="true"] {
+            border-color: var(--marcador);
+            color: var(--marcador);
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--suave);
+            outline-offset: 2px;
+        }
+
+        #rodar {
+            border-color: var(--marcador);
+            color: var(--marcador);
+            padding: 6px 16px;
+        }
+
+        #rodar:disabled {
+            opacity: .4;
+            cursor: wait;
+        }
+
+        input[type=range] {
+            width: 110px;
+            accent-color: var(--marcador);
+        }
+
+        /* leitura de dados */
+        .leituras {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            font-family: var(--mono);
+            font-size: 12px;
+            border: 1px solid var(--linha);
+        }
+
+        .leitura {
+            padding: 7px 14px;
+            border-right: 1px solid var(--linha);
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+        }
+
+        .leitura:last-child {
+            border-right: 0;
+        }
+
+        .leitura b {
+            font-weight: 400;
+            color: var(--apagado);
+            font-size: 10px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        .val-alvo {
+            color: var(--marcador);
+        }
+
+        .val-suave {
+            color: var(--suave);
+        }
+
+        .veredito {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--apagado);
+            min-height: 1.2em;
+        }
+
+        .veredito strong {
+            color: var(--texto);
+            font-weight: 400;
+        }
+
+        @media (max-width: 720px) {
+            .leitura {
+                flex: 1 1 50%;
+                border-bottom: 1px solid var(--linha);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="palco">
+        <video id="video" playsinline muted preload="auto"></video>
+    </div>
+
+    <div id="trilho">
+        <div id="aviso-fim">fim da faixa do vídeo</div>
+    </div>
+
+    <div id="hud">
+        <div>
+            <canvas id="regua"></canvas>
+            <div class="legenda-regua">
+                <span>frame 1</span>
+                <span id="legenda-meio">cada coluna = 1 frame · acesa = pintada pelo browser</span>
+                <span id="legenda-fim">frame —</span>
+            </div>
+        </div>
+
+        <div class="controles">
+            <div class="grupo">
+                <span class="rotulo">variante</span>
+                <div id="variantes"></div>
+            </div>
+
+            <div class="grupo">
+                <span class="rotulo">lerp</span>
+                <input type="range" id="lerp" min="0.02" max="1" step="0.01" value="0.12">
+                <span class="val-suave" id="lerp-val" style="font-family:var(--mono);font-size:12px">0.12</span>
+            </div>
+
+            <div class="grupo">
+                <span class="rotulo">faixa</span>
+                <div id="faixas"></div>
+            </div>
+
+            <button id="rodar">rodar passada de 2s</button>
+        </div>
+
+        <div class="leituras">
+            <div class="leitura"><b>alvo</b><span class="val-alvo" id="v-alvo">0.000</span></div>
+            <div class="leitura"><b>suave</b><span class="val-suave" id="v-suave">0.000</span></div>
+            <div class="leitura"><b>currentTime</b><span id="v-tempo">0.00s</span></div>
+            <div class="leitura"><b>px/frame</b><span id="v-pxframe">—</span></div>
+            <div class="leitura"><b>peso</b><span id="v-peso">—</span></div>
+            <div class="leitura"><b>frames pintados</b><span id="v-pintados">— / —</span></div>
+        </div>
+
+        <div class="veredito" id="veredito">Escolha uma variante e role a página. Depois rode a passada de 2s
+            para medir a cobertura de frames.</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Dados medidos pelo parser MP4 (átomos stsz/stss) na sessão de 07/08.
+        // frames e peso vêm do arquivo, não de estimativa.
+        const VARIANTES = [
+            { id: "orig", nome: "original", src: "assets/coffee-03.mp4", frames: 630, fps: 30, gop: 30, mb: 19.98, res: "1080p" },
+            { id: "A", nome: "A", src: "assets/scrub-testes/A-720p12-gop1.mp4", frames: 254, fps: 12, gop: 1, mb: 3.98, res: "720p" },
+            { id: "B", nome: "B", src: "assets/scrub-testes/B-720p12-gop5.mp4", frames: 254, fps: 12, gop: 5, mb: 1.90, res: "720p" },
+            { id: "C", nome: "C", src: "assets/scrub-testes/C-720p7-gop1.mp4", frames: 149, fps: 7, gop: 1, mb: 2.90, res: "720p" },
+            { id: "D", nome: "D", src: "assets/scrub-testes/D-1080p12-gop5.mp4", frames: 254, fps: 12, gop: 5, mb: 3.97, res: "1080p" }
+        ];
+        const FAIXAS = [1.0, 1.5, 2.0];
+
+        const video = document.getElementById("video");
+        const regua = document.getElementById("regua");
+        const ctx = regua.getContext("2d");
+
+        let variante = VARIANTES[1];      // começa em A
+        let faixaVh = 1.5;
+        let LERP = 0.12;
+
+        let alvoProgresso = 0, suaveProgresso = 0, ultimoTempoEscrito = -1;
+        let pintados = new Set();          // índices de frame efetivamente apresentados
+        let trigger = null;
+
+        const vh = () => window.innerHeight;
+        const passoFrame = () => 1 / variante.fps;
+
+        /* ---------- montagem dos controles ---------- */
+        function botoes(container, itens, ativo, aoClicar) {
+            container.innerHTML = "";
+            itens.forEach(it => {
+                const b = document.createElement("button");
+                b.textContent = it.rotulo;
+                b.setAttribute("aria-pressed", String(it.valor === ativo));
+                b.onclick = () => aoClicar(it.valor);
+                container.appendChild(b);
+            });
+        }
+
+        function montarControles() {
+            botoes(document.getElementById("variantes"),
+                VARIANTES.map(v => ({ rotulo: v.nome, valor: v.id })), variante.id,
+                id => { variante = VARIANTES.find(v => v.id === id); trocarVariante(); });
+
+            botoes(document.getElementById("faixas"),
+                FAIXAS.map(f => ({ rotulo: f.toFixed(1) + "vh", valor: f })), faixaVh,
+                f => { faixaVh = f; montarControles(); montarTrilho(); });
+        }
+
+        /* ---------- geometria: mesma da hero ---------- */
+        function montarTrilho() {
+            document.getElementById("trilho").style.height = (vh() * faixaVh + vh()) + "px";
+            if (trigger) trigger.kill();
+            // Mesmo desenho do index.html: o trigger só LÊ a posição.
+            trigger = ScrollTrigger.create({
+                trigger: "#trilho",
+                start: 0,
+                end: () => vh() * faixaVh,
+                invalidateOnRefresh: true,
+                onUpdate: self => { alvoProgresso = self.progress; }
+            });
+            ScrollTrigger.refresh();
+            desenharRegua();
+        }
+
+        /* ---------- o mesmo lerp do index.html ---------- */
+        gsap.ticker.add(() => {
+            if (!isFinite(video.duration)) return;
+            const d = alvoProgresso - suaveProgresso;
+            if (Math.abs(d) < 0.0005) suaveProgresso = alvoProgresso;
+            else suaveProgresso += d * (1 - Math.pow(1 - LERP, gsap.ticker.deltaRatio()));
+
+            const t = suaveProgresso * video.duration;
+            if (video.readyState >= 2 && Math.abs(t - ultimoTempoEscrito) >= passoFrame()) {
+                ultimoTempoEscrito = t;
+                video.currentTime = t;
+            }
+            atualizarLeituras();
+        });
+
+        /* ---------- contagem de frames REALMENTE apresentados ---------- */
+        function ouvirFrames() {
+            if (!video.requestVideoFrameCallback) {
+                document.getElementById("veredito").innerHTML =
+                    "<strong>Este browser não tem requestVideoFrameCallback</strong> — a contagem de frames pintados fica indisponível. A comparação visual continua valendo.";
+                return;
+            }
+            const passo = cb => video.requestVideoFrameCallback(cb);
+            passo(function marcar(_, meta) {
+                pintados.add(Math.round(meta.mediaTime * variante.fps));
+                desenharRegua();
+                passo(marcar);
+            });
+        }
+
+        /* ---------- a régua ---------- */
+        function desenharRegua() {
+            const dpr = window.devicePixelRatio || 1;
+            const w = regua.clientWidth, h = regua.clientHeight;
+            if (regua.width !== w * dpr) { regua.width = w * dpr; regua.height = h * dpr; }
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+
+            const n = variante.frames;
+            const larguraCol = w / n;
+
+            // colunas: apagadas por padrão, acesas quando o frame foi apresentado
+            for (let i = 0; i < n; i++) {
+                const aceso = pintados.has(i);
+                ctx.fillStyle = aceso ? "#ff5c1f" : "#22222a";
+                const x = i * larguraCol;
+                const alturaCol = aceso ? h - 16 : (h - 16) * 0.28;
+                ctx.fillRect(x, h - 8 - alturaCol, Math.max(larguraCol - 0.5, 0.6), alturaCol);
+            }
+
+            // playhead do progresso suave
+            const x = suaveProgresso * w;
+            ctx.fillStyle = "#4ec9ff";
+            ctx.fillRect(x - 1, 0, 2, h);
+            ctx.beginPath();
+            ctx.moveTo(x - 5, 0); ctx.lineTo(x + 5, 0); ctx.lineTo(x, 7); ctx.closePath();
+            ctx.fill();
+        }
+
+        /* ---------- leituras ---------- */
+        function atualizarLeituras() {
+            document.getElementById("v-alvo").textContent = alvoProgresso.toFixed(3);
+            document.getElementById("v-suave").textContent = suaveProgresso.toFixed(3);
+            document.getElementById("v-tempo").textContent =
+                (isFinite(video.currentTime) ? video.currentTime.toFixed(2) : "—") + "s";
+            document.getElementById("v-pintados").textContent = pintados.size + " / " + variante.frames;
+        }
+
+        function atualizarFixos() {
+            document.getElementById("v-pxframe").textContent = (vh() * faixaVh / variante.frames).toFixed(2);
+            document.getElementById("v-peso").textContent = variante.mb.toFixed(2) + " MB";
+            document.getElementById("legenda-fim").textContent = "frame " + variante.frames;
+        }
+
+        /* ---------- troca de variante ---------- */
+        function trocarVariante() {
+            pintados.clear();
+            ultimoTempoEscrito = -1;
+            video.src = variante.src;
+            video.load();
+            montarControles();
+            atualizarFixos();
+            desenharRegua();
+            document.getElementById("veredito").textContent =
+                "Carregando " + variante.nome + " (" + variante.res + ", " + variante.fps +
+                "fps, GOP " + variante.gop + ")…";
+            video.addEventListener("loadedmetadata", () => {
+                document.getElementById("veredito").innerHTML =
+                    "<strong>" + variante.nome + "</strong> pronta — " + variante.res + ", " +
+                    variante.fps + "fps, GOP " + variante.gop + ", " + variante.frames +
+                    " frames, " + (vh() * faixaVh / variante.frames).toFixed(2) + "px por frame.";
+                ouvirFrames();
+            }, { once: true });
+        }
+
+        /* ---------- passada padronizada de 2s (comparável entre variantes) ---------- */
+        document.getElementById("rodar").onclick = () => {
+            const btn = document.getElementById("rodar");
+            btn.disabled = true;
+            pintados.clear();
+            const distancia = vh() * faixaVh;
+            window.scrollTo(0, 0);
+            const t0 = performance.now();
+            const DUR = 2000;
+            (function passo(agora) {
+                const p = Math.min((agora - t0) / DUR, 1);
+                window.scrollTo(0, distancia * p);
+                if (p < 1) requestAnimationFrame(passo);
+                else setTimeout(() => {
+                    btn.disabled = false;
+                    const cob = (pintados.size / variante.frames * 100).toFixed(0);
+                    document.getElementById("veredito").innerHTML =
+                        "<strong>" + variante.nome + "</strong>: " + pintados.size + " de " +
+                        variante.frames + " frames pintados numa passada de 2s — <strong>" +
+                        cob + "% de cobertura</strong>. Quanto maior, mais o vídeo se lê como movimento.";
+                }, 600);
+            })(t0);
+        };
+
+        document.getElementById("lerp").oninput = e => {
+            LERP = parseFloat(e.target.value);
+            document.getElementById("lerp-val").textContent = LERP.toFixed(2);
+        };
+
+        window.addEventListener("resize", () => { montarTrilho(); atualizarFixos(); });
+
+        montarControles();
+        montarTrilho();
+        atualizarFixos();
+        trocarVariante();
+    </script>
+</body>
+
+</html>
