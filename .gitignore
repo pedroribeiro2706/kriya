@@ -21,3 +21,6 @@ dist/
 # Variantes de encode em avaliação (bancada teste-scrub.html). São tentativas
 # locais, ~12 MB. A variante ESCOLHIDA vai para assets/ e é versionada.
 assets/scrub-testes/
+
+# Screenshots de trabalho do Pedro
+assets/teste-scrub-screen.png
