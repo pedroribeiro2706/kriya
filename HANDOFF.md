@@ -58,7 +58,7 @@ O pipeline virou **skill global** a pedido do Pedro: `C:\Users\Pedro\.claude\ski
 ### PENDÊNCIAS EXPLÍCITAS (não fechadas nesta sessão)
 
 1. **Firefox / `webm` — NÃO MEDIDO.** O Firefox é comprovadamente ruim com mp4 nesse cenário mesmo com GOP baixo, e o iOS Safari prefere mp4. O plano previa avaliar um `<source>` webm, e isso **não foi feito** — o UAT foi só no Chrome. A ordem dos `<source>` tem que ser decidida medindo, não deduzindo (o browser usa o primeiro formato que suporta; se o Safari suportar webm mas render pior nele, pôr webm primeiro piora). Comando de encode pronto em `references/encode.md` da skill.
-2. **`coffee-03.mp4` (20 MB) — decisão revertida para o Pedro.** Eu afirmei que estava "sem uso" e **estava errado**: ele é referenciado por `portfolio.html:446`, `test-video-02.html`, `test-video-02-bkp-02.html`, `v-test-video-02-js-bkp.html`, `v-test-video-03.html`, `back-ups/test-video-03.html` e pela própria `teste-scrub.html` (que o usa como termo de comparação). O CLAUDE.md manda NÃO APAGAR esses protótipos. O Pedro autorizou a remoção com base na minha premissa errada, então **não removi** — a decisão precisa ser retomada com o fato correto.
+2. ~~**`coffee-03.mp4` (20 MB)**~~ — **DECIDIDO EM 07/08: MANTER. Questão encerrada, não reabrir.** Contexto para quem ler depois: eu afirmei que o arquivo estava "sem uso" e **estava errado** — ele é referenciado por `portfolio.html:446`, `test-video-02.html`, `test-video-02-bkp-02.html`, `v-test-video-02-js-bkp.html`, `v-test-video-03.html`, `back-ups/test-video-03.html` e pela própria `teste-scrub.html` (que o usa como termo de comparação, que é o valor da bancada). O CLAUDE.md manda NÃO APAGAR esses protótipos. O Pedro tinha autorizado a remoção com base na minha premissa errada; apresentado o fato correto, decidiu manter.
 3. **`assets/scrub-testes/`** (variantes B, C, D, ~9 MB) está no `.gitignore`, fora do git. Só existe nesta máquina; a bancada quebra parcialmente num clone novo.
 
 ### BACKLOG (ordem atualizada)
@@ -69,10 +69,12 @@ O pipeline virou **skill global** a pedido do Pedro: `C:\Users\Pedro\.claude\ski
 
 ### Roteiro sugerido para a próxima sessão
 
-1. Retomar a decisão sobre o `coffee-03.mp4` com o fato correto (pendência 2).
-2. Brainstorm do conceito do vídeo autoral **antes** de tocar no Higgsfield.
-3. Verificar o que o Higgsfield entrega (duração/resolução/formato) e só então gerar.
-4. Encodar pelo pipeline da skill, medir na bancada, UAT.
+A sessão de 07/08 encerrou aqui, com tudo publicado e verificado. O Pedro pediu explicitamente para **conversar sobre o Higgsfield na próxima sessão** — nada foi decidido sobre o vídeo autoral além do spec técnico.
+
+1. **Brainstorm do conceito do vídeo autoral, ANTES de tocar no Higgsfield.** O café atual é o ponto de partida a superar, não a referência a copiar. Esta conversa não aconteceu.
+2. Verificar o que o Higgsfield entrega (duração/resolução/formato) — **não verificado**, é premissa aberta.
+3. Encodar pelo pipeline da skill `video-scrub-bench` (`-r`, GOP 1, 720p, faststart), medir na bancada, UAT.
+4. Em paralelo ou depois: frente mobile (item 2), que pode absorver a pendência do Firefox/webm.
 
 ## Atualização 06/08/2026 — ITENS 1 E 2 DO BACKLOG RESOLVIDOS, APROVADOS NO UAT E PUBLICADOS
 
