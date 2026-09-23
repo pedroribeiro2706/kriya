@@ -2,7 +2,105 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
-## Atualização 07/08/2026 — SCRUB DO VÍDEO RESOLVIDO, APROVADO NO UAT E PUBLICADO. PRÓXIMA SESSÃO COMEÇA AQUI
+## Atualização 22/09/2026 — BRIEFING DO VÍDEO AUTORAL FECHADO E HIGGSFIELD VERIFICADO. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes:** `main` publicada na Vercel, deploy verificado por fetch da produção (botão do formulário já no ar em português). Working tree com `.claude/` untracked (pendência antiga, inofensiva). Nenhum vídeo foi gerado nesta sessão, nenhum crédito gasto.
+
+**Esta sessão não escreveu código de animação.** Foi uma sessão de decisão: o briefing do vídeo autoral (item 1 do backlog) foi fechado com o Pedro, e as capacidades reais do Higgsfield foram verificadas. A próxima sessão pode ir direto para a geração.
+
+### Trabalho entregue
+
+1. **Botão do formulário de contato traduzido** (`index.html:1403-1404`): `value="Submit"` → `"Enviar"` e `data-wait="Please wait..."` → `"Aguarde..."`. O segundo entrou junto porque é o texto que o mesmo botão exibe durante o envio; traduzir só o primeiro faria o inglês reaparecer no clique. Verificado que era a única string em inglês da página. Commit `e2d00a1`, no ar.
+2. **Regra nova no `CLAUDE.md` do projeto: vídeo aprovado nunca é sobrescrito.** Pedido explícito do Pedro. Versão nova entra com nome próprio (`hero-scrub-v2.mp4`) e convive com a que está no ar; a troca só acontece após UAT aprovado, e o anterior permanece no repositório. **Isto REVOGA a instrução de 07/08** que previa o arquivo novo entrando com o mesmo nome para evitar mudança de código.
+
+### O vídeo atual, medido nesta sessão (não é hipótese)
+
+Quadros extraídos com ffmpeg e **olhados um a um em tamanho cheio**, conforme o protocolo da skill `video-local-ffmpeg`. Evidências guardadas em **`references/video-atual/`** (`t0.1s.png`, `t3.5s.png`, `t5.25s.png`, `t7.0s.png`, `t13.0s.png`, `t17s.png`, `ultimo.png`, `recorte-mao-t5.25s.png`).
+
+- `assets/coffee-03.mp4` (master): 1920×1080, 30fps, 21,0 s, 20,9 MB
+- `assets/hero-scrub.mp4` (no ar): 1280×720, 12fps, 21,17 s, 3,98 MB
+- **Composição:** xícara vista de cima a prumo sobre fundo preto, ligeiramente à esquerda do centro e abaixo da linha do meio, alça para baixo/esquerda. Mão entra pela esquerda e envolve a alça (polegar por cima). Câmera se aproxima até a superfície do café tomar a tela. Escurece até preto.
+- **A superfície é espuma de leite bege com bolhas, não crema** — confirma a observação do Pedro.
+- **A falta de definição está no MASTER 1080p, não no encode de agosto.** O `coffee-03.mp4` já é macio: superfície fora de foco e pele sem textura. Consequência: não há ajuste técnico que resolva; só refazendo o vídeo.
+- **O fade ocupa mais de um terço do vídeo.** Medido por `signalstats/YAVG`: brilho médio 151 aos 11 s, 124 aos 13 s, 41 aos 16 s, 16 aos 19 s (16 = preto de faixa limitada). O escurecimento começa por volta dos 12 s de 21 s ⇒ **~35% da rolagem da hero é tela apagando**.
+- **`ffmpeg` e `ffprobe` 9.0 estão no PATH desta máquina** (`ffmpeg version 9.0-full_build-www.gyan.dev`). **Isto corrige a nota de 07/08** que dizia não haver ffprobe e motivou escrever um parser de átomos MP4 à mão — não é mais necessário.
+
+### O briefing do vídeo, fechado com o Pedro
+
+| Item | Decisão |
+|---|---|
+| Referência da superfície | **`references/expresso-02.jfif`** (escolha do Pedro). Crema avelã alaranjado, bolhas finas concentradas no meio, anel mais escuro na borda. **Sem desenho de leite** — a `expresso-03` foi descartada por ter latte art |
+| Xícara | **Xícara de espresso** (pequena, parede grossa), não a caneca grande de hoje. Opção B aprovada |
+| Fundo | **Preto total.** Nada mais no quadro: sem mesa, sem pires, sem grão. A luz clara de estúdio da referência 02 **não** vem junto |
+| Enquadramento inicial | Mesma posição e tamanho de hoje. Critério de aceitação = comparar com `references/video-atual/t0.1s.png` |
+| Mão | **Entrada e momento preservados** (pela esquerda). **Aparência livre** — o Pedro disse que não precisa parecer com a de hoje. Especificar apenas: pinça com polegar e indicador, unhas curtas/limpas/aparadas, sem anel, sem relógio, pele com textura natural, resto da mão fora do quadro ou no escuro |
+| Movimento | Aproximação **contínua e lenta**, sem nenhum corte. Corte vira salto na tela porque quem controla o vídeo é a rolagem |
+| Final | Superfície tomando a tela, depois escurece. **Fade mais curto: ~15% do vídeo, não 35%** (opção A aprovada) |
+| Áudio | Nenhum |
+
+**Observação do Pedro que corrigiu uma imprecisão minha:** ele apontou que a xícara atual já parece a da referência 02. Está certo. Vistas de cima, e sem nenhum objeto no quadro que dê escala, caneca e xícara de espresso são o mesmo círculo branco com alça. **O que entrega o tamanho é a mão.** Logo, a opção B custa menos do que eu havia pintado: o objeto quase não muda, muda a proporção mão/xícara e o gesto.
+
+**Decisões deliberadamente NÃO tomadas:** o escurecimento continua dentro do vídeo, não passa para o site (opção C descartada). Motivo: a engrenagem do scroll foi estabilizada em 07/08 e não se mexe no que está funcionando.
+
+### Higgsfield — o que foi VERIFICADO em 22/09/2026
+
+CLI `higgsfield 1.1.13` instalado e no PATH. Conta **pedro.clock@gmail.com, plano plus, 1000 créditos** nesta data. Autenticação ativa, não foi preciso login.
+
+**Durações máximas**, descobertas com `higgsfield generate cost` (consulta de preço, **não gasta crédito**):
+
+| Modelo | Duração máxima | Cabe o vídeo de 21 s? |
+|---|---|---|
+| `veo3_1` (Google Veo 3.1) | 4, 6 ou 8 s | não |
+| `kling2_6` | 5 ou 10 s | não |
+| `kling3_0`, `minimax_h3_max`, `grok_video_v15` | 15 s | não |
+| `seedance_2_0` | 15 s | não |
+| **`seedance_2_5`** | **30 s** | **sim** |
+| **`wan3_0`** | **30 s** | **sim** |
+| **`wan3_0_prime`** | **30 s** | **sim** |
+
+**O risco levantado no começo da sessão (clipes de 5–10 s exigindo emenda, e emenda = corte = salto no scrub) NÃO se confirmou.** Três modelos fazem 21 s de tirada única.
+
+**Custo por tentativa de 21 s** (créditos):
+
+| Modelo | 720p | 1080p |
+|---|---|---|
+| `wan3_0` | 36,75 | 73,5 |
+| `wan3_0_prime` | 63 | 126 |
+| `seedance_2_5` | 147 | 252 |
+
+Com 1000 créditos: ~13 tentativas no `wan3_0` a 1080p, ~8 no Prime, ~4 no Seedance 2.5.
+
+**Resoluções:** `seedance_2_5` e `wan3_0` vão até **1080p** (não têm 4K). O `seedance_2_0` tem 4K mas só 15 s. **1080p basta** — o master atual é 1080p e o alvo final é 720p.
+
+**Achado que muda o método: dá para fixar o primeiro quadro.** Ambos aceitam `--start-image` (e `--end-image`), ou seja, recebem uma imagem pronta e animam a partir dela.
+- `wan3_0`: aceita direto. Restrições declaradas: `end_image` exige `start_image`; nenhum dos dois combina com `image_references`.
+- `seedance_2_5`: `start_image`/`end_image` **só no modo `omni_reference`** (o modo `t2v` não aceita mídia de referência).
+
+Isso resolve "manter a posição e o tamanho da xícara" por construção, em vez de descrever em palavras e torcer para a máquina acertar.
+
+**Detalhe de execução:** `generate_audio` vem `true` por padrão nos dois modelos. Passar `false`.
+
+### Plano para a próxima sessão — imagem primeiro, vídeo depois
+
+A lógica: errar numa imagem custa pouco, errar num vídeo de 21 s custa caro. E se o café não estiver bonito parado, não vai ficar bonito em movimento. **O Pedro aprovou este encadeamento; falta apenas o "pode gerar" do passo 1.**
+
+1. **Gerar o primeiro quadro como imagem parada.** Xícara de espresso com o crema da `expresso-02`, fundo preto, posição e tamanho de `references/video-atual/t0.1s.png`. Modelo sugerido: GPT Image 2 (padrão para alta fidelidade) ou Nano Banana 2 com as duas imagens como referência. Gastar as tentativas aqui.
+2. **Pedro escolhe uma.**
+3. **Animar a imagem escolhida**, começando pelo **`wan3_0`** (mais barato). Se o movimento não convencer, subir para `wan3_0_prime` e depois `seedance_2_5`. Prompt com ênfase em movimento contínuo e lento, sem corte.
+4. **Tratar o arquivo escolhido pelo pipeline da skill `video-scrub-bench`**: `-r 12`, GOP 1, 720p, `-movflags +faststart`, sem áudio. Alvo ~250 quadros, como o `hero-scrub.mp4` atual.
+5. **Salvar como `hero-scrub-v2.mp4`**, lado a lado com o atual. **Não sobrescrever** (regra do `CLAUDE.md`).
+6. **Bancada (`teste-scrub.html`) + site**, comparando com o atual, e UAT do Pedro rolando de verdade.
+7. **Aprovado** → o v2 assume o lugar, o anterior fica no repositório. **Reprovado** → mantém o de hoje, nada se perde.
+
+### Riscos conhecidos para a próxima sessão
+
+- **Mão é o que geradores de imagem mais erram** (dedos a mais, articulação impossível). Por isso o briefing pede pouca mão no quadro. Se vier torta, a saída é gerar de novo, não consertar. **Contar com várias tentativas.**
+- **Movimento contínuo sem corte não é garantido pelo modelo** — é pedido no prompt. Verificar quadro a quadro antes de aprovar, com o protocolo da `video-local-ffmpeg` (tira de contato para navegar, quadro cheio para julgar).
+- **Não verificado:** se `wan3_0` respeita bem `start_image` com fundo preto total. É o primeiro teste real do passo 3.
+
+---
+
+## Atualização 07/08/2026 — SCRUB DO VÍDEO RESOLVIDO, APROVADO NO UAT E PUBLICADO
 
 **Estado dos ambientes:** `main` = `7ca2dfd` (merge), publicada na Vercel — **verificado por fetch da produção**: serve `assets/hero-scrub.mp4` (3,98 MB), `HERO_VIDEO_VH = 2.0`, `LERP = 0.08`, `VIDEO_FPS = 12`, guarda `readyState >= 2` presente. Working tree limpo (`.claude/` untracked, pendência antiga). Branch `ajuste-scrub-video-hero` preservada. Spec: `docs/superpowers/specs/2026-08-07-video-scrub-hero-design.md` · Plano: `docs/superpowers/plans/2026-08-07-video-scrub-hero.md`.
 
