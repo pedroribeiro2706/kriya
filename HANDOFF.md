@@ -2,7 +2,61 @@
 
 Documento de passagem de contexto entre sessões. Escrito pelo agente que fez a retomada do projeto na sessão de 19/07/2026 (que rodou no diretório antigo do OneDrive), para que a próxima sessão — nesta pasta `G:\Pedro\Dev\Kriya` — comece sem redescobrir nada.
 
-## Atualização 22/09/2026 — BRIEFING DO VÍDEO AUTORAL FECHADO E HIGGSFIELD VERIFICADO. PRÓXIMA SESSÃO COMEÇA AQUI
+## Atualização 23/09/2026 — VÍDEO AUTORAL v2 GERADO, APROVADO NO UAT E PUBLICADO. PRÓXIMA SESSÃO COMEÇA AQUI
+
+**Estado dos ambientes:** `main` publicada na Vercel com a v2 (commits `a3b6c48` + `10977ee`, push nesta sessão). **Deploy verificado por fetch da produção:** o `index.html` no ar aponta para `assets/hero-scrub-v2.mp4` e o arquivo responde HTTP 200 com 8 201 406 bytes (idêntico ao local). Working tree com `.claude/` untracked (pendência antiga, inofensiva). Créditos Higgsfield: 1000 → **909,5** (17 em imagens + 73,5 no vídeo).
+
+**Sessão de produção.** O plano de 22/09 foi executado de ponta a ponta: imagem → escolha do Pedro → animação → conversão → bancada → UAT → publicação. **Nenhuma retentativa de vídeo foi necessária.**
+
+### Passo 1 — primeiro quadro como imagem parada (17 créditos)
+
+- 4 candidatas, todas com as duas referências anexadas (`references/video-atual/t0.1s.png` para posição/tamanho, `references/expresso-02.jfif` para o crema), 16:9, 2k. A e B no GPT Image 2 (6,5 créditos cada), C e D no Nano Banana 2 (2 cada). Prompt guardado em `references/primeiro-quadro/prompt-imagem.txt`.
+- Todas acertaram: xícara de espresso na posição do vídeo atual, alça para baixo/esquerda, fundo preto medido (YAVG 16 nos cantos = preto de faixa limitada), crema laranja-avelã sem latte art. Diferença: A e B (GPT) mais naturais, com bolhas irregulares; C mais brilhante; D com anel escuro marcado e crema uniforme demais.
+- **Pedro escolheu a A** ("Concordo. Escolho a A"). Arquivos: `references/primeiro-quadro/candidata-A-gpt.png` (escolhida), `-B-gpt`, `-C-nano`, `-D-nano`, `comparativo-2x2.png`.
+
+### Passo 2 — animação no `wan3_0` (73,5 créditos, primeira e única tentativa)
+
+- `--start-image` = candidata A, `--duration 21`, `--resolution 1080p`, `--aspect_ratio 16:9`, `--generate_audio false`. Prompt em `references/video-v2/prompt-video.txt`: tirada única sem corte, dolly-in lento e constante, mão entra pelo canto inferior esquerdo nos primeiros segundos e pinça a alça (unhas curtas, sem anel), xícara imóvel, crema nítido até tomar a tela, **sem fade** (o fade é feito na conversão, não pela máquina).
+- ⚠️ **Bug do CLI `higgsfield` 1.1.13, contorno obrigatório:** `generate create --image <arquivo>` (ou `--start-image <arquivo>`) falha no envio automático com `SignatureDoesNotMatch` do S3 e **não cobra crédito**. O que funciona: `higgsfield upload create <arquivo>` antes (devolve um UUID) e passar o UUID no lugar do caminho. Aconteceu 4 vezes seguidas com imagens; com UUID, 100% de sucesso.
+- Master entregue: 1920×1080, 30 fps, 21,0 s, 630 frames, 3 keyframes, sem áudio, **107 MB**. Tempo de fila: ~20 min.
+
+### O que foi VERIFICADO no vídeo antes de mostrar ao Pedro (protocolo `video-local-ffmpeg`)
+
+- Tira de contato (`references/video-v2/contato-12.png`) só para navegar. Quadros em tamanho cheio olhados um a um: `t2s` (mão aberta entrando pelo canto inferior esquerdo), `t4s` (indicador por cima da alça, polegar por baixo com unha visível, unhas curtas, sem anel, pele com textura), `t6s`, `t8s` (xícara crescendo, mão saindo do quadro), `t12s` (crema toma quase tudo; o resto da mão vira mancha escura fora de foco no canto inferior esquerdo), `t16s` (crema nítido, borda branca nas laterais), `ultimo.png` (só um fio de borda no canto superior esquerdo).
+- Medições: **nenhum corte** (`select='gt(scene,0.3)'` vazio); fundo preto puro (YAVG 16 nos cantos até 14 s; depois quem entra nos cantos é a borda branca da xícara, não o fundo clareando); diferença média entre quadros consecutivos sobe suave de 0,1 (0 s) a 8,0 (15 s) e desce — é a velocidade do zoom no crema texturado, não solavanco.
+- **Cadência do `wan3_0`:** entre 10 s e 20 s os quadros "quase iguais" (diferença < 4) aparecem em padrão regular de ~5 quadros (pares adjacentes: 1 4 1 4 1 4…). É a assinatura de geração a 24 fps preenchida para 30. **Não incomodou no UAT a 12 fps.** Se um dia incomodar: decimar os quase-duplicados (`mpdecimate`) antes de reamostrar para 12, partindo do master.
+
+### Conversão e escolha do encode
+
+- Mesmo pipeline da `video-scrub-bench` (720p, `-r 12`, GOP 1 via `keyint=1:min-keyint=1:scenecut=0`, `-movflags +faststart`, `-an`) **+ `fade=t=out:st=17.8:d=3.1`** (3,1 s = 14,8% do vídeo; último quadro medido YAVG=YMAX=16, preto absoluto). Resultado: 254 frames, 12 fps, 21,17 s — **mesmos números do `hero-scrub.mp4`**, logo `HERO_VIDEO_VH = 2.0` e `VIDEO_FPS = 12` no `index.html` seguem válidos sem mexer.
+- **Crema em close pesa ~2× para comprimir.** crf 23 GOP 1 deu 13,9 MB (o atual tem 4 MB). Testei crf 26 (9,9), crf 28 (7,8), GOP 3 crf 24 (9,4), GOP 5 crf 23 (7,7). Comparei o quadro de 16 s em tamanho cheio entre crf 23 e crf 28 (`references/video-v2/v2-gop1-crf23-t16s.png` vs `v2-gop1-crf28-t16s.png`): bolhas finas preservadas nos dois. **Ficou crf 28 GOP 1 = 7,8 MB** como `assets/hero-scrub-v2.mp4`. A crf 23 (13,9 MB) ficou em `assets/scrub-testes-v2/` como "v2 máx" na bancada; as outras 3 foram para o OneDrive (`...\Kriya Design\Portfolio\Videos\kriya-v2-encodes-testes-2026-09-23\`).
+- Master no repo: `assets/hero-v2-master.mp4` = recompressão crf 18 (33 MB, 1080p/30fps/630 frames). O bruto de 107 MB **não cabe no GitHub** (limite 100 MB) e está em `...\Kriya Design\Portfolio\Videos\hero-v2-master-raw-higgsfield-wan3_0-2026-09-23.mp4`.
+
+### UAT e publicação
+
+- Bancada `teste-scrub.html` ganhou as variantes **v2** e **v2 máx** (comentário no código explica a origem). Pedro assistiu ao arquivo e rodou o dev server: "Gostei muito do resultado". A v2 entrou no `index.html` local para ele ver na página de verdade; depois: **"Pode publicar"**.
+- `index.html:448` → `src="assets/hero-scrub-v2.mp4"` (comentário acima da tag explica). Os comentários dos blocos `HERO_VIDEO_VH` e `VIDEO_FPS` foram atualizados; os valores não mudaram. **`hero-scrub.mp4` permanece no repositório**, sem uso no site, como garantia (regra de 22/09).
+- Commits: `a3b6c48` (vídeos, candidatas, bancada) e `10977ee` (troca no site). Push em `main` → deploy automático na Vercel, verificado (ver "Estado dos ambientes").
+
+### Evidências guardadas (não apagar)
+
+- `references/primeiro-quadro/`: as 4 candidatas, `comparativo-2x2.png`, `prompt-imagem.txt`.
+- `references/video-v2/`: `contato-12.png`, `t2s/t4s/t6s/t8s/t12s/t16s.png`, `ultimo.png`, os dois quadros de comparação de compressão, `prompt-video.txt`. Quadros extraídos mas **não julgados** (t0.1, t10, t14, t18, t20, q492–q494) foram para o OneDrive (`...\Kriya Design\Portfolio\Videos\kriya-v2-quadros-nao-julgados-2026-09-23\`) para não inchar o repositório.
+
+### Backlog atualizado (ordem de prioridade)
+
+1. **Responsividade mobile** ("tudo muito desencaixado"; no mobile a luminária não existe — o acordeon `#service` assume). Agravante novo a medir: a v2 pesa 7,8 MB contra 4 MB da anterior. Se o carregamento no celular pesar, gerar um encode mais leve a partir de `hero-v2-master.mp4` (ex.: 960×540 ou crf 30) e medir na bancada.
+2. **Firefox / `webm`** — continua NÃO medido (o UAT de 07/08 e o de hoje foram só no Chrome).
+3. Manutenção de skills (opcional): registrar o contorno do bug de upload em `higgsfield-generate/references/troubleshooting.md`; corrigir `video-scrub-bench` (SKILL.md e `references/encode.md` ainda dizem que o ffmpeg não está no PATH — está, versão 9.0, desde 22/09).
+
+### Riscos / não verificado
+
+- Não medi a v2 em mobile nem em Firefox (mesma lacuna de 07/08).
+- A mão só aparece entre ~2 s e ~10 s; de 12 s em diante vira mancha escura fora de foco no canto inferior esquerdo (visto em `t12s.png`). Aprovado pelo Pedro como está.
+
+---
+
+## Atualização 22/09/2026 — BRIEFING DO VÍDEO AUTORAL FECHADO E HIGGSFIELD VERIFICADO (executado em 23/09, ver seção acima)
 
 **Estado dos ambientes:** `main` publicada na Vercel, deploy verificado por fetch da produção (botão do formulário já no ar em português). Working tree com `.claude/` untracked (pendência antiga, inofensiva). Nenhum vídeo foi gerado nesta sessão, nenhum crédito gasto.
 
